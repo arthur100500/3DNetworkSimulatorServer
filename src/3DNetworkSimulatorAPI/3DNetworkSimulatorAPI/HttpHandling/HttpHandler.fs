@@ -2,7 +2,6 @@
 
 open FsHttp
 open GnsSettings;
-open System.Net.Http
 open Util
 
 module HttpHandler =
@@ -47,22 +46,22 @@ module HttpHandler =
             body
         }
 
-    let private sendRequest request =
-        task {
-            let! response = request |> Request.sendAsync
-            return response
-        }
-
-    let private getResponseText request =
-        let response = sendRequest request in
-        let content = response.Result.content in
-        let textContent = (content.ReadAsStream ()) |> streamToStr |> Async.RunSynchronously in
-        textContent
-
     let sendGnsRequest request = 
         let createRequest = function
             | GET (uriList) -> buildUri uriList |> makeGetRequest
             | POST (uriList, data) -> (buildUri uriList |> makePostRequest) data
             | DELETE (uriList) -> buildUri uriList |> makeDeleteRequest 
+        in
+        let sendRequest request =
+            task {
+                let! response = request |> Request.sendAsync
+                return response
+            }
+        in
+        let getResponseText request =
+            let response = sendRequest request in
+            let content = response.Result.content in
+            let textContent = (content.ReadAsStream ()) |> streamToStr |> Async.RunSynchronously in
+            textContent
         in
         createRequest request |> getResponseText
