@@ -9,58 +9,55 @@ open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 
 module Program =
     let exitCode = 0
-    
+
     let settings = HttpHandler.globalGnsSettings
 
     let reqs = new GnsHandler(settings)
-     
-    let apiEndpoints = [
-        subRoute "/v2" [
-            GET [
-                (* General *)
-                route "/" (warbler (fun _ -> text "This is an API"))
 
-                (* Projects *)
-                route "/projects" (reqs.projectsGet ())
-                
-                (* Nodes *)
-                routef "/projects/%s/nodes" reqs.nodesGet
-               
-                (* Links *)
-                routef "/projects/%s/links" reqs.linksGet
-                routef "/projects/%s/links/%s" reqs.linksIDGet
-            ]
-            POST [
-                (* Projects *)
-                route "/projects" (reqs.projectsPost ())
-                routef "/projects/%s/open" reqs.projectsOpenPost
+    let apiEndpoints =
+        [ subRoute
+              "/v2"
+              [ GET
+                    [
+                      (* General *)
+                      route "/" (warbler (fun _ -> text "This is an API"))
 
-                (* Nodes *)
-                routef "/projects/%s/nodes" reqs.nodesPost
-                routef "/projects/%s/nodes/%s" reqs.nodesIdPost
-                routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
-                routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
+                      (* Projects *)
+                      route "/projects" (reqs.projectsGet ())
 
-                (* Links *)
-                routef "/projects/%s/links" reqs.linksPost
-            ]
-            DELETE [
-                (* Nodes *)
-                routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
+                      (* Nodes *)
+                      routef "/projects/%s/nodes" reqs.nodesGet
 
-                (* Links *)
-                routef "/projects/%s/links/%s" reqs.linksIDDelete
-            ]
-        ]
-    ]
+                      (* Links *)
+                      routef "/projects/%s/links" reqs.linksGet
+                      routef "/projects/%s/links/%s" reqs.linksIDGet ]
+                POST
+                    [
+                      (* Projects *)
+                      route "/projects" (reqs.projectsPost ())
+                      routef "/projects/%s/open" reqs.projectsOpenPost
 
-    let configureApp (app : IApplicationBuilder) =
-        app.UseRouting()
-           .UseEndpoints(fun e -> e.MapGiraffeEndpoints(apiEndpoints))
+                      (* Nodes *)
+                      routef "/projects/%s/nodes" reqs.nodesPost
+                      routef "/projects/%s/nodes/%s" reqs.nodesIdPost
+                      routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
+                      routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
+
+                      (* Links *)
+                      routef "/projects/%s/links" reqs.linksPost ]
+                DELETE
+                    [
+                      (* Nodes *)
+                      routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
+
+                      (* Links *)
+                      routef "/projects/%s/links/%s" reqs.linksIDDelete ] ] ]
+
+    let configureApp (app: IApplicationBuilder) =
+        app.UseRouting().UseEndpoints(fun e -> e.MapGiraffeEndpoints(apiEndpoints))
         |> ignore
 
-    let configureServices (services : IServiceCollection) =
-        services.AddGiraffe() |> ignore
+    let configureServices (services: IServiceCollection) = services.AddGiraffe() |> ignore
 
 
     [<EntryPoint>]
@@ -72,7 +69,7 @@ module Program =
 
         if app.Environment.IsDevelopment() then
             app.UseDeveloperExceptionPage() |> ignore
-    
+
         configureApp app
         app.Run()
 
