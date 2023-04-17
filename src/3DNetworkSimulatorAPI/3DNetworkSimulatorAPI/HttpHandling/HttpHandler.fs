@@ -1,7 +1,7 @@
 ﻿namespace _3DNetworkSimulatorAPI
 
 open FsHttp
-open GnsSettings;
+open _3DNetworkSimulatorAPI.GnsHandling.GnsSettings;
 open Util
 
 module HttpHandler =
@@ -18,8 +18,8 @@ module HttpHandler =
         Password = "666";
     }
 
-    let private buildUri (parts : list<string>) = 
-        List.fold (fun p n -> p + "/" + n) (getAddrBegin globalGnsSettings) parts 
+    let private buildUri (settings: gnsSettings) (parts : list<string>) = 
+        List.fold (fun p n -> p + "/" + n) (getAddrBegin settings) parts 
 
     let private makePostRequest (endpoint : string) (jsonData : string) =
         printfn "Post to: %s" endpoint
@@ -46,11 +46,11 @@ module HttpHandler =
             body
         }
 
-    let sendGnsRequest request = 
+    let sendGnsRequest request currentGnsSettings = 
         let createRequest = function
-            | GET (uriList) -> buildUri uriList |> makeGetRequest
-            | POST (uriList, data) -> (buildUri uriList |> makePostRequest) data
-            | DELETE (uriList) -> buildUri uriList |> makeDeleteRequest 
+            | GET (uriList) -> buildUri currentGnsSettings uriList |> makeGetRequest
+            | POST (uriList, data) -> (buildUri currentGnsSettings uriList |> makePostRequest) data
+            | DELETE (uriList) -> buildUri currentGnsSettings uriList |> makeDeleteRequest 
         in
         let sendRequest request =
             task {

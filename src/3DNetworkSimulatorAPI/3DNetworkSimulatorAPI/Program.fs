@@ -5,48 +5,51 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
 open Giraffe.EndpointRouting
-open ProjectsHandler
-open LinksHandler
-open NodesHandler
+open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 
 module Program =
     let exitCode = 0
+    
+    let settings = HttpHandler.globalGnsSettings
 
+    let reqs = new GnsHandler(settings)
+     
     let apiEndpoints = [
         subRoute "/v2" [
             GET [
+                (* General *)
                 route "/" (warbler (fun _ -> text "This is an API"))
 
                 (* Projects *)
-                route "/projects" (projectsGet ())
+                route "/projects" (reqs.projectsGet ())
                 
                 (* Nodes *)
-                routef "/projects/%s/nodes" nodesGet
+                routef "/projects/%s/nodes" reqs.nodesGet
                
                 (* Links *)
-                routef "/projects/%s/links" linksGet
-                routef "/projects/%s/links/%s" linksIDGet
+                routef "/projects/%s/links" reqs.linksGet
+                routef "/projects/%s/links/%s" reqs.linksIDGet
             ]
             POST [
                 (* Projects *)
-                route "/projects" (projectsPost ())
-                routef "/projects/%s/open" projectsOpenPost
+                route "/projects" (reqs.projectsPost ())
+                routef "/projects/%s/open" reqs.projectsOpenPost
 
                 (* Nodes *)
-                routef "/projects/%s/nodes" nodesPost
-                routef "/projects/%s/nodes/%s" nodesIdPost
-                routef "/projects/%s/nodes/%s/start" nodesStartPost
-                routef "/projects/%s/nodes/%s/stop" nodesStopPost
+                routef "/projects/%s/nodes" reqs.nodesPost
+                routef "/projects/%s/nodes/%s" reqs.nodesIdPost
+                routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
+                routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
 
                 (* Links *)
-                routef "/projects/%s/links" linksPost
+                routef "/projects/%s/links" reqs.linksPost
             ]
             DELETE [
                 (* Nodes *)
-                routef "/projects/%s/nodes/%s" nodesIdDelete
+                routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
 
                 (* Links *)
-                routef "/projects/%s/links/%s" linksIDDelete
+                routef "/projects/%s/links/%s" reqs.linksIDDelete
             ]
         ]
     ]

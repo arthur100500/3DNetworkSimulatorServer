@@ -1,5 +1,8 @@
-﻿module GnsSettings
+﻿namespace _3DNetworkSimulatorAPI.GnsHandling
 
+open FSharp.Json
+
+module GnsSettings =
     type gnsSettings = {
         Protocol : string;
         BaseIP : string;
@@ -14,3 +17,9 @@
 
     let getAuth (currentGnsSettings : gnsSettings) = 
         currentGnsSettings.User + ":" + currentGnsSettings.Password
+
+    let fromJson jsonString = 
+        Json.deserialize<gnsSettings> jsonString
+
+    let toJson settings =
+        Json.serialize settings
