@@ -11,13 +11,9 @@ module GnsSettings =
           Password: string }
 
     let getAddrBegin (currentGnsSettings: gnsSettings) =
-        let int2String x = sprintf "%i" x in
-
-        currentGnsSettings.Protocol
-        + "://"
-        + currentGnsSettings.BaseIP
-        + ":"
-        + (int2String currentGnsSettings.Port)
+        let int2String x = $"%i{x}" in
+        let stringPort = int2String currentGnsSettings.Port in
+        $"{currentGnsSettings.Protocol}://{currentGnsSettings.BaseIP}:{stringPort}"
 
     let getAuth (currentGnsSettings: gnsSettings) =
         currentGnsSettings.User + ":" + currentGnsSettings.Password

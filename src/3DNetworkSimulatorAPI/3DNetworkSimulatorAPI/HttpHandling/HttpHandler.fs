@@ -10,13 +10,6 @@ module HttpHandler =
         | GET of string list
         | DELETE of string list
 
-    let globalGnsSettings: gnsSettings =
-        { Protocol = "http"
-          BaseIP = "127.0.0.1"
-          Port = 3080
-          User = "admin"
-          Password = "666" }
-
     let private buildUri (settings: gnsSettings) (parts: list<string>) =
         List.fold (fun p n -> p + "/" + n) (getAddrBegin settings) parts
 

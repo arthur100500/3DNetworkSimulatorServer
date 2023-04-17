@@ -1,0 +1,7 @@
+{
+  "Protocol": "http",
+  "BaseIP": "127.0.0.1",
+  "Port": 3080,
+  "User": "admin",
+  "Password": "666"
+}
