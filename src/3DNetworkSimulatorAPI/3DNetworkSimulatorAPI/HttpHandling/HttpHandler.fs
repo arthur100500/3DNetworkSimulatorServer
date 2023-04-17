@@ -19,10 +19,10 @@ module HttpHandler =
         Password = "666";
     }
 
-    let buildUri (parts : list<string>) = 
+    let private buildUri (parts : list<string>) = 
         List.fold (fun p n -> p + "/" + n) (getAddrBegin globalGnsSettings) parts 
 
-    let makePostRequest (endpoint : string) (jsonData : string) =
+    let private makePostRequest (endpoint : string) (jsonData : string) =
         printfn "Post to: %s" endpoint
         http {
             POST endpoint
@@ -31,7 +31,7 @@ module HttpHandler =
             json jsonData
         }
 
-    let makeGetRequest (endpoint : string) =
+    let private makeGetRequest (endpoint : string) =
         printfn "Get to: %s" endpoint
         http {
             GET endpoint
@@ -39,7 +39,7 @@ module HttpHandler =
             body
         }
 
-    let makeDeleteRequest (endpoint : string) =
+    let private makeDeleteRequest (endpoint : string) =
         printfn "Delete to: %s" endpoint
         http {
             DELETE endpoint
@@ -47,13 +47,13 @@ module HttpHandler =
             body
         }
 
-    let sendRequest request =
+    let private sendRequest request =
         task {
             let! response = request |> Request.sendAsync
             return response
         }
 
-    let getResponseText request =
+    let private getResponseText request =
         let response = sendRequest request in
         let content = response.Result.content in
         let textContent = (content.ReadAsStream ()) |> streamToStr |> Async.RunSynchronously in
