@@ -4,6 +4,10 @@ open Microsoft.AspNetCore.Http
 open Giraffe
 open _3DNetworkSimulatorAPI.Util
 open _3DNetworkSimulatorAPI.HttpHandler
+open _3DNetworkSimulatorAPI.GnsWSConsole
+open System.Threading.Tasks
+open FsHttp
+open System.Net.WebSockets
 
 module GnsHandler =
     type GnsHandler(settings) =
@@ -67,3 +71,21 @@ module GnsHandler =
 
         member this.linksIDDelete(project_id, link_id) : HttpHandler =
             createRequestTask (DELETE [ "v2"; "projects"; project_id; "links"; link_id ])
+
+        member this.webConsole(project_id, node_id) : HttpHandler = 
+            let acceptWebsocket (wsTask : Task<WebSocket>) =
+                task { 
+                    let ws = wsTask.Result in
+                    let gnsWsConsole = new GnsWSConsole(ws) in
+                    gnsWsConsole.Start () |> ignore
+                } |> Async.AwaitTask |> Async.RunSynchronously
+            in
+            fun (next: HttpFunc) (ctx: HttpContext) ->
+                match ctx.WebSockets.IsWebSocketRequest with
+                | false -> 
+                    (setStatusCode 404) next ctx
+                | true -> 
+                    printfn "WebSocket request: %s" (HttpContextExtensions.GetRequestUrl ctx)
+                    acceptWebsocket (ctx.WebSockets.AcceptWebSocketAsync ()) |> ignore
+                    next ctx
+
