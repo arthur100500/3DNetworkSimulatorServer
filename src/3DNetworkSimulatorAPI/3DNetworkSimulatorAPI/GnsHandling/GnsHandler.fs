@@ -73,19 +73,18 @@ module GnsHandler =
             createRequestTask (DELETE [ "v2"; "projects"; project_id; "links"; link_id ])
 
         member this.webConsole(project_id, node_id) : HttpHandler = 
-            let acceptWebsocket (wsTask : Task<WebSocket>) =
-                task { 
-                    let ws = wsTask.Result in
-                    let gnsWsConsole = new GnsWSConsole(ws) in
-                    gnsWsConsole.Start () |> ignore
-                } |> Async.AwaitTask |> Async.RunSynchronously
-            in
             fun (next: HttpFunc) (ctx: HttpContext) ->
+                let url = (HttpContextExtensions.GetRequestUrl ctx)
+                let acceptWebsocket (wsTask : Task<WebSocket>) =
+                    task { 
+                        let ws = wsTask.Result in
+                        let gnsWsConsole = new GnsWSConsole(ws, url, settings) in
+                        gnsWsConsole.Start () |> ignore
+                    } |> Async.AwaitTask |> Async.RunSynchronously
                 match ctx.WebSockets.IsWebSocketRequest with
-                | false -> 
-                    (setStatusCode 404) next ctx
+                | false -> (setStatusCode 404) next ctx
                 | true -> 
-                    printfn "WebSocket request: %s" (HttpContextExtensions.GetRequestUrl ctx)
+                    printfn "WebSocket request: %s" url
                     acceptWebsocket (ctx.WebSockets.AcceptWebSocketAsync ()) |> ignore
                     next ctx
 

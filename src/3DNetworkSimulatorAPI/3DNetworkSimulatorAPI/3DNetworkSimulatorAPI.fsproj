@@ -20,6 +20,7 @@
         <PackageReference Include="FsHttp" Version="10.0.0" />
         <PackageReference Include="Giraffe" Version="6.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.2.1" />
+        <PackageReference Include="websocket-sharp-Net6.0" Version="1.0.3.1" />
     </ItemGroup>
 
 </Project>
