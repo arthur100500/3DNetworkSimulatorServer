@@ -10,6 +10,7 @@ open _3DNetworkSimulatorAPI.GnsHandling
 open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
 open _3DNetworkSimulatorAPI.Views.Views
+
 module Program =
     let exitCode = 0
 
@@ -27,35 +28,32 @@ module Program =
                   "/v2"
                   choose[GET
                          >=> choose
-                                 [ (* General *)
-                                   route "/" >=> (warbler (fun _ -> text "This is an API"))
-                                   (* Projects *)
-                                   route "/projects" >=> (reqs.projectsGet ())
-                                   (* Nodes *)
-                                   routef "/projects/%s/nodes" reqs.nodesGet
-                                   (* Links *)
-                                   routef "/projects/%s/links" reqs.linksGet
-                                   routef "/projects/%s/links/%s" reqs.linksIDGet ]
+                             [ (* General *) route "/" >=> (warbler (fun _ -> text "This is an API"))
+                                             (* Projects *)
+                                             route "/projects" >=> (reqs.projectsGet ())
+                                             (* Nodes *)
+                                             routef "/projects/%s/nodes" reqs.nodesGet
+                                             (* Links *)
+                                             routef "/projects/%s/links" reqs.linksGet
+                                             routef "/projects/%s/links/%s" reqs.linksIDGet ]
 
                          POST
                          >=> choose
-                                 [ (* Projects *)
-                                   route "/projects" >=> (reqs.projectsPost ())
-                                   routef "/projects/%s/open" reqs.projectsOpenPost
-                                   (* Nodes *)
-                                   routef "/projects/%s/nodes" reqs.nodesPost
-                                   routef "/projects/%s/nodes/%s" reqs.nodesIdPost
-                                   routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
-                                   routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
-                                   (* Links *)
-                                   routef "/projects/%s/links" reqs.linksPost ]
+                             [ (* Projects *) route "/projects" >=> (reqs.projectsPost ())
+                                              routef "/projects/%s/open" reqs.projectsOpenPost
+                                              (* Nodes *)
+                                              routef "/projects/%s/nodes" reqs.nodesPost
+                                              routef "/projects/%s/nodes/%s" reqs.nodesIdPost
+                                              routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
+                                              routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
+                                              (* Links *)
+                                              routef "/projects/%s/links" reqs.linksPost ]
 
                          DELETE
                          >=> choose
-                                 [ (* Nodes *)
-                                   routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
-                                   (* Links *)
-                                   routef "/projects/%s/links/%s" reqs.linksIDDelete ]
+                             [ (* Nodes *) routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
+                                           (* Links *)
+                                           routef "/projects/%s/links/%s" reqs.linksIDDelete ]
 
                          routef "/projects/%s/nodes/%s/console/ws" reqs.webConsole] ]
 

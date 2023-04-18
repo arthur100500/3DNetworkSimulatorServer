@@ -17,7 +17,7 @@ module GnsWSConsole =
             match Array.length sliced with
             | 1 -> raise (new Exception("URL was not designed for GNS3, as \"v2\" substring was not present"))
             | n ->
-                let furtherPart = String.Join "v2", sliced[1..]
+                let furtherPart = String.Join ("v2", sliced[1..])
                 let addrBegin = getWsAddrBegin settings
                 $"{addrBegin}/v2{furtherPart}"
 

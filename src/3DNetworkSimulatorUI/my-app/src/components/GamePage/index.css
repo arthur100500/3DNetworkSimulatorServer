@@ -1,0 +1,9 @@
+#react-unity-webgl-canvas-1 {
+    height: 100%;
+    width: 100%;
+}
+
+#unity-game {
+    height: 600px;
+    width: 800px;
+}

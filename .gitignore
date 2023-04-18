@@ -351,3 +351,7 @@ MigrationBackup/
 src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/encodings.xml
 src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/vcs.xml
 src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/indexLayout.xml
+src/3DNetworkSimulatorUI/my-app/public/build/webgl.data
+src/3DNetworkSimulatorUI/my-app/public/build/Comp.loader.js
+src/3DNetworkSimulatorUI/my-app/public/build/build.wasm
+src/3DNetworkSimulatorUI/my-app/public/build/build.framework.js
