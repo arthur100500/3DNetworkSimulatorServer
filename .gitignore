@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/encodings.xml
+src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/vcs.xml
+src/3DNetworkSimulatorAPI/.idea/.idea.3DNetworkSimulatorAPI/.idea/indexLayout.xml
