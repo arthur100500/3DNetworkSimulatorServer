@@ -8,11 +8,19 @@ open _3DNetworkSimulatorAPI.GnsWSConsole
 open System.Threading.Tasks
 open FsHttp
 open System.Net.WebSockets
+open System.Collections.Generic
 
 module GnsHandler =
     type GnsHandler(settings) =
-        let createRequestTask request next ctx =
-            task { return! (text (sendGnsRequest request settings)) next ctx }
+        let createRequestTask request next (ctx : HttpContext) =
+            task { 
+                ctx.SetHttpHeader ("Access-Control-Allow-Origin", "*")
+                ctx.SetHttpHeader ("Access-Control-Allow-Methods", "OPTIONS, POST, GET")
+                ctx.SetHttpHeader ("Access-Control-Allow-Credentials", "true")
+
+                let resp = (text (sendGnsRequest request settings)) 
+                return! resp next ctx 
+            }
 
         let getContentString (ctx: HttpContext) =
             (ctx.Request.Body |> streamToStr) |> Async.RunSynchronously
