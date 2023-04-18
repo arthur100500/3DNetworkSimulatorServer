@@ -9,7 +9,7 @@ open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 open _3DNetworkSimulatorAPI.GnsHandling
 open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
-
+open _3DNetworkSimulatorAPI.Views.Views
 module Program =
     let exitCode = 0
 
@@ -27,8 +27,7 @@ module Program =
                   "/v2"
                   choose[GET
                          >=> choose
-                                 [
-                                   (* General *)
+                                 [ (* General *)
                                    route "/" >=> (warbler (fun _ -> text "This is an API"))
                                    (* Projects *)
                                    route "/projects" >=> (reqs.projectsGet ())
@@ -40,8 +39,7 @@ module Program =
 
                          POST
                          >=> choose
-                                 [
-                                   (* Projects *)
+                                 [ (* Projects *)
                                    route "/projects" >=> (reqs.projectsPost ())
                                    routef "/projects/%s/open" reqs.projectsOpenPost
                                    (* Nodes *)
@@ -54,8 +52,7 @@ module Program =
 
                          DELETE
                          >=> choose
-                                 [
-                                   (* Nodes *)
+                                 [ (* Nodes *)
                                    routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
                                    (* Links *)
                                    routef "/projects/%s/links/%s" reqs.linksIDDelete ]
@@ -79,6 +76,8 @@ module Program =
 
         if app.Environment.IsDevelopment() then
             app.UseDeveloperExceptionPage() |> ignore
+
+        printfn "Web env: %s" app.Environment.WebRootPath
 
         configureApp app
         app.Run()
