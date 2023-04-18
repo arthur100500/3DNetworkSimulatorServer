@@ -6,21 +6,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-	    <Compile Include="Util\Util.fs" />
-        <Compile Include="Middleware\WebsocketMiddleware.fs" />
-	    <Compile Include="GnsHandling\GnsSettings.fs" />
-        <Compile Include="HttpHandling\HttpHandler.fs" />
-	    <Compile Include="GnsHandling\GnsWSConsole.fs" />
-        <Compile Include="GnsHandling\GnsHandler.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="Util\Util.fs"/>
+        <Compile Include="Middleware\WebsocketMiddleware.fs"/>
+        <Compile Include="GnsHandling\GnsSettings.fs"/>
+        <Compile Include="HttpHandling\HttpHandler.fs"/>
+        <Compile Include="GnsHandling\GnsWSConsole.fs"/>
+        <Compile Include="GnsHandling\GnsHandler.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.Json" Version="0.4.1" />
-        <PackageReference Include="FsHttp" Version="10.0.0" />
-        <PackageReference Include="Giraffe" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.2.1" />
-        <PackageReference Include="websocket-sharp-Net6.0" Version="1.0.3.1" />
+        <PackageReference Include="FSharp.Json" Version="0.4.1"/>
+        <PackageReference Include="FsHttp" Version="10.0.0"/>
+        <PackageReference Include="Giraffe" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.2.1"/>
+        <PackageReference Include="websocket-sharp-Net6.0" Version="1.0.3.1"/>
     </ItemGroup>
 
 </Project>
