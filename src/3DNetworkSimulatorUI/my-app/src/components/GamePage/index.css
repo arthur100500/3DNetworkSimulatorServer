@@ -1,0 +1,15 @@
+#react-unity-webgl-canvas-1 {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+}
+
+#unity-game {
+    height: 600px;
+    width: 1000px;
+}
+
+#main-div {
+    margin: auto;
+    width: 1000px;
+}
