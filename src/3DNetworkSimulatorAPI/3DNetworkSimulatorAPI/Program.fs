@@ -55,25 +55,26 @@ module Program =
 
 
     let configureApp (app: IApplicationBuilder) =
-        app.UseRouting()
-           .UseWebSockets()
-           .UseMiddleware<WebSocketMiddleware>()
-           |> ignore
+        app.UseRouting().UseWebSockets().UseMiddleware<WebSocketMiddleware>() |> ignore
 
         app.UseCors(
-            Action<_>(fun (builder : Infrastructure.CorsPolicyBuilder) -> 
-            builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)) |> ignore
-    
+            Action<_>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
+        )
+        |> ignore
+
         app.UseGiraffe apiEndpoints
 
-    let configureServices (services: IServiceCollection) = 
-        services.AddCors(fun options ->
-            options.AddPolicy(
-                "Policy",
-                Action<Infrastructure.CorsPolicyBuilder>(fun (builder : Infrastructure.CorsPolicyBuilder) -> 
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
-            ))
-            .AddGiraffe() |> ignore
+    let configureServices (services: IServiceCollection) =
+        services
+            .AddCors(fun options ->
+                options.AddPolicy(
+                    "Policy",
+                    Action<Infrastructure.CorsPolicyBuilder>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
+                ))
+            .AddGiraffe()
+        |> ignore
 
     [<EntryPoint>]
     let main args =
@@ -84,8 +85,6 @@ module Program =
 
         if app.Environment.IsDevelopment() then
             app.UseDeveloperExceptionPage() |> ignore
-
-        printfn "Web env: %s" app.Environment.WebRootPath
 
         configureApp app
         app.Run()
