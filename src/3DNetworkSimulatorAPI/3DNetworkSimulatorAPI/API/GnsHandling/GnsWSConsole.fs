@@ -17,7 +17,7 @@ module GnsWSConsole =
             match Array.length sliced with
             | 1 -> raise (new Exception("URL was not designed for GNS3, as \"v2\" substring was not present"))
             | n ->
-                let furtherPart = String.Join ("v2", sliced[1..])
+                let furtherPart = String.Join("v2", sliced[1..])
                 let addrBegin = getWsAddrBegin settings
                 $"{addrBegin}/v2{furtherPart}"
 
@@ -32,32 +32,39 @@ module GnsWSConsole =
                 |> Async.AwaitTask
                 |> Async.RunSynchronously
 
-            let sendMessage =
+            let sendStringMessage =
                 let response = Encoding.ASCII.GetString(buffer)
                 gnsWs.Send response
                 mirrorLoop gnsWs
 
+            let sendByteMessage =
+                let log = Encoding.ASCII.GetString(buffer)
+                let response = buffer.ToArray()
+                gnsWs.Send response
+                mirrorLoop gnsWs
+
             match result.MessageType with
-            | WebSocketMessageType.Text -> sendMessage
-            | WebSocketMessageType.Binary -> sendMessage
+            | WebSocketMessageType.Text -> sendStringMessage
+            | WebSocketMessageType.Binary -> sendByteMessage
             | WebSocketMessageType.Close -> ()
             | _ -> printfn "Unsopported type"
 
         let messageResend (e: MessageEventArgs) =
-            let sendBytes dataBytes =
+            let sendBytes (dataBytes : array<byte>) messageType =
+                let log = Encoding.ASCII.GetString dataBytes
                 let dataBytesSegment = ArraySegment<byte> dataBytes
 
-                ws.SendAsync(dataBytesSegment, WebSocketMessageType.Binary, true, CancellationToken.None)
+                ws.SendAsync(dataBytesSegment, messageType, true, CancellationToken.None)
                 |> Async.AwaitTask
                 |> Async.RunSynchronously
 
             match e.IsBinary, e.IsText, e.IsPing with
             | true, false, false ->
                 let dataBytes = e.RawData
-                sendBytes dataBytes
+                sendBytes dataBytes WebSocketMessageType.Binary
             | false, true, false ->
                 let dataBytes = Encoding.ASCII.GetBytes e.Data
-                sendBytes dataBytes
+                sendBytes dataBytes WebSocketMessageType.Text
             | false, false, true ->
                 let dataBytesSegment = ArraySegment<byte> e.RawData
 

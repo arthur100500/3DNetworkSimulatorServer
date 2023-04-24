@@ -383,3 +383,7 @@ src/3DNetworkSimulatorUI/my-app/public/build/Build/build.wasm
 src/3DNetworkSimulatorUI/my-app/public/build/Build/build.framework.js.gz
 src/3DNetworkSimulatorUI/my-app/public/build/Build/build.framework.js
 src/3DNetworkSimulatorUI/my-app/public/build/Build/build.data.gz
+src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/Game/Build/Comp.wasm.gz
+src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/Game/Build/Comp.loader.js
+src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/Game/Build/Comp.framework.js.gz
+src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/Game/Build/Comp.data.gz
