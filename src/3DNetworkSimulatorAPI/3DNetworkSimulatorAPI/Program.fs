@@ -1,8 +1,8 @@
 namespace _3DNetworkSimulatorAPI
 
 open System.IO
+open System.Text
 open Microsoft.AspNetCore.Builder
-open Microsoft.AspNetCore.Cors.Infrastructure;
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
@@ -13,16 +13,24 @@ open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
 open Microsoft.AspNetCore.Cors
 open System
+open Microsoft.AspNetCore.Authentication.JwtBearer;
+open Microsoft.IdentityModel.Tokens;
 
 module Program =
+    let secret = "SECRET_KEY_TO_CHANGE_IN_FUTURE_rjbgnvlsdjf23quir"
+
+    let domain = "127.0.0.1:5000"
+
     let exitCode = 0
 
     let logger = new ConsoleLogger()
 
+    let checkOwnership = fun y z -> y z
+
     let reqs =
         let configs = "Config/" in
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        new GnsHandler(settings, logger)
+        new GnsHandler(settings, logger, checkOwnership)
 
     let displayNotFound next (ctx: HttpContext) =
         (text (HttpContextExtensions.GetRequestUrl ctx)) next ctx
@@ -67,7 +75,7 @@ module Program =
         app.UseRouting()
             .UseWebSockets()
             .UseMiddleware<WebSocketMiddleware>()
-            .UseAuthentication()
+            //.UseAuthentication()
             .UseCors(cors)
             |> ignore
 
@@ -82,6 +90,18 @@ module Program =
         let cors = 
             fun (options : Infrastructure.CorsOptions) ->
                 options.AddPolicy ("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))  
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(fun options ->
+                options.TokenValidationParameters <- TokenValidationParameters(
+                    ValidateActor = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = domain,
+                    ValidAudience = domain,
+                    IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)))
+                ) |> ignore
 
         services
             .AddCors(cors)

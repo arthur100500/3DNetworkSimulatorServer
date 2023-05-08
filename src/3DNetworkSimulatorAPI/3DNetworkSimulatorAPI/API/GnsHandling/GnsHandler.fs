@@ -11,8 +11,9 @@ open System.Net.WebSockets
 open System.Collections.Generic
 
 module GnsHandler =
-    type GnsHandler(settings, logger) =
-        let createRequestTask request next (ctx: HttpContext) =
+    type GnsHandler(settings, logger, ownershipCheck) =
+        let createRequestTask request =
+            ownershipCheck >=> fun next (ctx: HttpContext) ->
             task {
                 try
                     let resp = (text (sendGnsRequest request settings logger))
