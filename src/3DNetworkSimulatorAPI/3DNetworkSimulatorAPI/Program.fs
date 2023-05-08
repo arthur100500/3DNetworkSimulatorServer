@@ -12,6 +12,7 @@ open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
 open Microsoft.AspNetCore.Cors
 open System
+open System.Threading.Tasks
 
 module Program =
     let exitCode = 0
@@ -23,6 +24,8 @@ module Program =
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
         new GnsHandler(settings, logger)
 
+    let checkOwnership = fun y z -> y z
+
     let displayNotFound next (ctx: HttpContext) =
         (text (HttpContextExtensions.GetRequestUrl ctx)) next ctx
 
@@ -32,28 +35,28 @@ module Program =
                   "/v2"
                   choose[GET
                          >=> choose
-                             [ route "/" >=> (warbler (fun _ -> text "This is an API"))
-                               route "/projects" >=> (reqs.projectsGet ())
-                               routef "/projects/%s/nodes" reqs.nodesGet
-                               routef "/projects/%s/links" reqs.linksGet
-                               routef "/projects/%s/links/%s" reqs.linksIDGet ]
+                             [ route "/" >=> checkOwnership >=> (warbler (fun _ -> text "This is an API"))
+                               route "/projects" >=> checkOwnership >=> (reqs.projectsGet ())
+                               routef "/projects/%s/nodes" (fun x -> checkOwnership >=> reqs.nodesGet x)
+                               routef "/projects/%s/links" (fun x -> checkOwnership >=> reqs.linksGet x)
+                               routef "/projects/%s/links/%s" (fun x -> checkOwnership >=> reqs.linksIDGet x) ]
 
                          POST
                          >=> choose
-                             [ route "/projects" >=> (reqs.projectsPost ())
-                               routef "/projects/%s/open" reqs.projectsOpenPost
-                               routef "/projects/%s/nodes" reqs.nodesPost
-                               routef "/projects/%s/nodes/%s" reqs.nodesIdPost
-                               routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
-                               routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
-                               routef "/projects/%s/links" reqs.linksPost ]
+                             [ route "/projects" >=> checkOwnership >=> (reqs.projectsPost ())
+                               routef "/projects/%s/open" (fun x -> checkOwnership >=> reqs.projectsOpenPost x)
+                               routef "/projects/%s/nodes" (fun x -> checkOwnership >=> reqs.nodesPost x)
+                               routef "/projects/%s/nodes/%s" (fun x -> checkOwnership >=> reqs.nodesIdPost x)
+                               routef "/projects/%s/nodes/%s/start" (fun x -> checkOwnership >=> reqs.nodesStartPost x)
+                               routef "/projects/%s/nodes/%s/stop" (fun x -> checkOwnership >=> reqs.nodesStopPost x)
+                               routef "/projects/%s/links" (fun x -> checkOwnership >=> reqs.linksPost x) ]
 
                          DELETE
                          >=> choose
-                             [ routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
-                               routef "/projects/%s/links/%s" reqs.linksIDDelete ]
+                             [ routef "/projects/%s/nodes/%s" (fun x -> checkOwnership >=> reqs.nodesIdDelete x)
+                               routef "/projects/%s/links/%s" (fun x -> checkOwnership >=> reqs.linksIDDelete x) ]
 
-                         routef "/projects/%s/nodes/%s/console/ws" (fun _ -> reqs.webConsole logger)] ]
+                         routef "/projects/%s/nodes/%s/console/ws" (fun _ -> checkOwnership >=> reqs.webConsole logger)] ]
 
 
     let configureApp (app: IApplicationBuilder) =
