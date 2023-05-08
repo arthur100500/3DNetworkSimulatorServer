@@ -1,17 +1,12 @@
 namespace _3DNetworkSimulatorAPI
 
-open System.IO
 open System.Text
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
-open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
-open _3DNetworkSimulatorAPI.GnsHandling
-open _3DNetworkSimulatorAPI.Logger
 open _3DNetworkSimulatorAPI.Auth
-
-open Microsoft.AspNetCore.Http
+open _3DNetworkSimulatorAPI.Routes
 open WebSocketApp.Middleware
 open Microsoft.AspNetCore.Cors
 open System
@@ -21,54 +16,9 @@ open Microsoft.IdentityModel.Tokens;
 module Program =
     let secret = Auth.secret
 
-    let domain = "127.0.0.1:5000"
+    let domain = Auth.domain
 
     let exitCode = 0
-
-    let logger = new ConsoleLogger()
-
-    let checkOwnership = 
-        let authorize =
-            requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
-        authorize
-
-    let reqs =
-        let configs = "Config/" in
-        let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        new GnsHandler(settings, logger, checkOwnership)
-
-    let displayNotFound next (ctx: HttpContext) =
-        (text (HttpContextExtensions.GetRequestUrl ctx)) next ctx
-
-    let apiEndpoints =
-        choose
-            [ subRoute
-                  "/v2"
-                  choose[GET
-                         >=> choose
-                             [ route "/" >=> (warbler (fun _ -> text "This is an API"))
-                               route "/projects" >=> (reqs.projectsGet ())
-                               routef "/projects/%s/nodes" reqs.nodesGet
-                               routef "/projects/%s/links" reqs.linksGet
-                               routef "/projects/%s/links/%s" reqs.linksIDGet ]
-
-                         POST
-                         >=> choose
-                             [ route "/projects" >=> (reqs.projectsPost ())
-                               routef "/projects/%s/open" reqs.projectsOpenPost
-                               routef "/projects/%s/nodes" reqs.nodesPost
-                               routef "/projects/%s/nodes/%s" reqs.nodesIdPost
-                               routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
-                               routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
-                               routef "/projects/%s/links" reqs.linksPost ]
-
-                         DELETE
-                         >=> choose
-                             [ routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
-                               routef "/projects/%s/links/%s" reqs.linksIDDelete ]
-
-                         routef "/projects/%s/nodes/%s/console/ws" (fun _ -> reqs.webConsole logger)] ]
-
 
     let configureApp (app: IApplicationBuilder) =
         let allowAll = 
@@ -80,11 +30,12 @@ module Program =
         app.UseRouting()
             .UseWebSockets()
             .UseMiddleware<WebSocketMiddleware>()
-            //.UseAuthentication()
+            .UseAuthentication()
+            .UseStaticFiles()
             .UseCors(cors)
             |> ignore
 
-        app.UseGiraffe apiEndpoints
+        app.UseGiraffe Routes.apiEndpoints
 
 
     let configureServices (services: IServiceCollection) =

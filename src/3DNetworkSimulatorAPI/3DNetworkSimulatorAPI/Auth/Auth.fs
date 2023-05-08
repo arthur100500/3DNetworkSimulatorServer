@@ -12,6 +12,8 @@ open Microsoft.AspNetCore.Http
 
 module Auth =
     let secret = "12312312321312kflgsdflgnmsdflmg_REMOVE_LATER"
+
+    let domain = "127.0.0.1:5000"
     
     let authorize : HttpHandler =
         requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
@@ -28,8 +30,8 @@ module Auth =
 
         let token =
             JwtSecurityToken(
-                issuer = "jwtwebapp.net",
-                audience = "jwtwebapp.net",
+                issuer = domain,
+                audience = domain,
                 claims = claims,
                 expires = expires,
                 notBefore = notBefore,
