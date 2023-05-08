@@ -2,6 +2,7 @@ namespace _3DNetworkSimulatorAPI
 
 open System.IO
 open Microsoft.AspNetCore.Builder
+open Microsoft.AspNetCore.Cors.Infrastructure;
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
@@ -60,26 +61,36 @@ module Program =
 
 
     let configureApp (app: IApplicationBuilder) =
-        app.UseRouting().UseWebSockets().UseMiddleware<WebSocketMiddleware>() |> ignore
+        let allowAll = 
+            fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
 
-        app.UseCors(
-            Action<_>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
-                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
-        )
-        |> ignore
+        let cors = Action<_>(allowAll)
+
+        app.UseRouting()
+            .UseWebSockets()
+            .UseMiddleware<WebSocketMiddleware>()
+            .UseAuthentication()
+            .UseCors(cors)
+            |> ignore
 
         app.UseGiraffe apiEndpoints
 
+
     let configureServices (services: IServiceCollection) =
+        let allowAll = 
+            fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
+
+        let cors = 
+            fun (options : Infrastructure.CorsOptions) ->
+                options.AddPolicy ("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))  
+
         services
-            .AddCors(fun options ->
-                options.AddPolicy(
-                    "Policy",
-                    Action<Infrastructure.CorsPolicyBuilder>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
-                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
-                ))
+            .AddCors(cors)
             .AddGiraffe()
         |> ignore
+
 
     [<EntryPoint>]
     let main args =
