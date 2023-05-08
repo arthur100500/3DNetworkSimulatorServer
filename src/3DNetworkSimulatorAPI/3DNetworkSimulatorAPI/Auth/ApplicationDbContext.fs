@@ -7,9 +7,6 @@ open Microsoft.EntityFrameworkCore.Design
 type ApplicationDbContext(options : DbContextOptions<ApplicationDbContext>) = 
     inherit IdentityDbContext(options)
 
-    override __.OnModelCreating (modelBuilder : ModelBuilder) =
-        base.OnModelCreating(modelBuilder)
-
 type ApplicationDbContextFactory() =
     interface IDesignTimeDbContextFactory<ApplicationDbContext> with
         member __.CreateDbContext (args: string[]) =

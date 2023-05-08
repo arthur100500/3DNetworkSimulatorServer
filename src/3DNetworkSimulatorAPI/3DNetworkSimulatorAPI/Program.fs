@@ -63,7 +63,7 @@ module Program =
                 ) |> ignore
 
         services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->  
-            options.UseSqlite("Filename=users.db") |> ignore
+            options.UseSqlite("Data Source=identity.db") |> ignore
         ) |> ignore
 
         services.AddIdentity<IdentityUser, IdentityRole>(fun options -> 
