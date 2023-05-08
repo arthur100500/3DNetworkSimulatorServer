@@ -37,26 +37,20 @@ module Auth =
                 notBefore = notBefore,
                 signingCredentials = signingCredentials)
 
-        let tokenResult = {
+        let tokenResult : Models.TokenResult = {
             Token = JwtSecurityTokenHandler().WriteToken(token)
         }
 
         tokenResult
 
-    let handleGetSecured =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let email = ctx.User.FindFirst ClaimTypes.NameIdentifier
-            
-            text ("User " + email.Value + " is authorized to access this resource.") next ctx
-
     let handlePostToken =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             task {
-                let! model = ctx.BindJsonAsync<LoginViewModel>()
+                let! model = ctx.BindJsonAsync<Models.LoginModel>()
 
                 // authenticate user
             
-                let tokenResult = generateToken model.Email
+                let tokenResult = generateToken model.Username
 
                 return! json tokenResult next ctx
             }
