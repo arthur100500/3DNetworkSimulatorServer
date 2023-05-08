@@ -8,7 +8,9 @@ open Microsoft.Extensions.Hosting
 open Giraffe
 open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 open _3DNetworkSimulatorAPI.GnsHandling
-open _3DNetworkSimulatorAPI.Logger;
+open _3DNetworkSimulatorAPI.Logger
+open _3DNetworkSimulatorAPI.Auth
+
 open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
 open Microsoft.AspNetCore.Cors
@@ -17,7 +19,7 @@ open Microsoft.AspNetCore.Authentication.JwtBearer;
 open Microsoft.IdentityModel.Tokens;
 
 module Program =
-    let secret = "SECRET_KEY_TO_CHANGE_IN_FUTURE_rjbgnvlsdjf23quir"
+    let secret = Auth.secret
 
     let domain = "127.0.0.1:5000"
 
@@ -25,7 +27,10 @@ module Program =
 
     let logger = new ConsoleLogger()
 
-    let checkOwnership = fun y z -> y z
+    let checkOwnership = 
+        let authorize =
+            requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
+        authorize
 
     let reqs =
         let configs = "Config/" in

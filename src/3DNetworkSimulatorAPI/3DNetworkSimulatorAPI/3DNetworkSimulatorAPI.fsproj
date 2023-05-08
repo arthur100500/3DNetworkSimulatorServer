@@ -4,9 +4,11 @@
     <RootNamespace>_3DNetworkSimulatorAPI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+	<Compile Include="Models\Models.fs" />
     <Compile Include="Middleware\WebsocketMiddleware.fs" />
     <Compile Include="Logger\Logger.fs" />
     <Compile Include="Util\Util.fs" />
+	<Compile Include="Auth\Auth.fs" />
     <Compile Include="API\GnsHandling\GnsSettings.fs" />
     <Compile Include="API\HttpHandling\HttpHandler.fs" />
     <Compile Include="API\GnsHandling\GnsWSConsole.fs" />

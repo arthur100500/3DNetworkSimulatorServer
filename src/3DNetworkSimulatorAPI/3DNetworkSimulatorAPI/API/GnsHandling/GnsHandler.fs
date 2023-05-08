@@ -8,7 +8,6 @@ open _3DNetworkSimulatorAPI.GnsWSConsole
 open System.Threading.Tasks
 open FsHttp
 open System.Net.WebSockets
-open System.Collections.Generic
 
 module GnsHandler =
     type GnsHandler(settings, logger, ownershipCheck) =
