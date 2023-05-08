@@ -11,11 +11,11 @@ open System.Net.WebSockets
 open System.Collections.Generic
 
 module GnsHandler =
-    type GnsHandler(settings) =
+    type GnsHandler(settings, logger) =
         let createRequestTask request next (ctx: HttpContext) =
             task {
                 try
-                    let resp = (text (sendGnsRequest request settings))
+                    let resp = (text (sendGnsRequest request settings logger))
                     return! resp next ctx
                 with
                     | _ -> 
@@ -81,14 +81,14 @@ module GnsHandler =
         member this.linksIDDelete(project_id, link_id) : HttpHandler =
             createRequestTask (DELETE [ "v2"; "projects"; project_id; "links"; link_id ])
 
-        member this.webConsole(project_id, node_id) : HttpHandler =
+        member this.webConsole(logger) : HttpHandler =
             fun (next: HttpFunc) (ctx: HttpContext) ->
                 let url = (HttpContextExtensions.GetRequestUrl ctx)
 
                 let acceptWebsocket (wsTask: Task<WebSocket>) =
                     task {
                         let ws = wsTask.Result in
-                        let gnsWsConsole = new GnsWSConsole(ws, url, settings) in
+                        let gnsWsConsole = new GnsWSConsole(ws, url, settings, logger) in
                         gnsWsConsole.Start() |> ignore
                     }
                     |> Async.AwaitTask

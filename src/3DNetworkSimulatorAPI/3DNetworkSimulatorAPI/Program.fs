@@ -7,19 +7,21 @@ open Microsoft.Extensions.Hosting
 open Giraffe
 open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 open _3DNetworkSimulatorAPI.GnsHandling
+open _3DNetworkSimulatorAPI.Logger;
 open Microsoft.AspNetCore.Http
 open WebSocketApp.Middleware
-open _3DNetworkSimulatorAPI.Views.Views
 open Microsoft.AspNetCore.Cors
 open System
 
 module Program =
     let exitCode = 0
 
+    let logger = new ConsoleLogger()
+
     let reqs =
         let configs = "Config/" in
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        new GnsHandler(settings)
+        new GnsHandler(settings, logger)
 
     let displayNotFound next (ctx: HttpContext) =
         (text (HttpContextExtensions.GetRequestUrl ctx)) next ctx
@@ -51,7 +53,7 @@ module Program =
                              [ routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
                                routef "/projects/%s/links/%s" reqs.linksIDDelete ]
 
-                         routef "/projects/%s/nodes/%s/console/ws" reqs.webConsole] ]
+                         routef "/projects/%s/nodes/%s/console/ws" (fun _ -> reqs.webConsole logger)] ]
 
 
     let configureApp (app: IApplicationBuilder) =
