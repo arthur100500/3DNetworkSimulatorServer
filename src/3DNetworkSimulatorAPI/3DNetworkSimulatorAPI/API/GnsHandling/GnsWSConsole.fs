@@ -86,4 +86,7 @@ module GnsWSConsole =
             }
 
         member this.Start() =
-            startListening |> Async.AwaitTask |> Async.RunSynchronously
+            try
+                startListening |> Async.AwaitTask |> Async.RunSynchronously
+            with
+                ex -> printfn "Exception occured. Maybe this was an error"
