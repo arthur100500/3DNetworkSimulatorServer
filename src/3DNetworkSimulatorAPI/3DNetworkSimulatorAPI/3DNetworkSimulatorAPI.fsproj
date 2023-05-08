@@ -4,7 +4,7 @@
     <RootNamespace>_3DNetworkSimulatorAPI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-	  <Compile Include="Models\Models.fs" />
+	<Compile Include="Models\Models.fs" />
     <Compile Include="Middleware\WebsocketMiddleware.fs" />
     <Compile Include="Logger\Logger.fs" />
     <Compile Include="Util\Util.fs" />
@@ -15,7 +15,8 @@
     <Compile Include="API\GnsHandling\GnsWSConsole.fs" />
     <Compile Include="API\GnsHandling\GnsHandler.fs" />
 	<Compile Include="Routes\Routes.fs" />
-    <Compile Include="Program.fs" />
+	<Compile Include="Migrations/*.fs" />
+	<Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EntityFrameworkCore.FSharp" Version="6.0.7" />

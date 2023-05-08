@@ -52,8 +52,8 @@ type ApplicationDbContextModelSnapshot() =
 
 
             b.HasData([|
-                {| Id = "58d09902-4edd-45b2-b380-9899052214d7"; ConcurrencyStamp = "0d003aaf-2478-42dc-a92a-8441b4d181cd"; Name = "admin"; NormalizedName = "ADMIN" |}
-                {| Id = "7f3e9d51-c611-4043-a24b-363a15b54b49"; ConcurrencyStamp = "78c3a3c9-fd72-4f0b-a8fc-e6cb92a478bc"; Name = "user"; NormalizedName = "USER" |}
+                {| Id = "f46fcbd1-8ad5-447a-adf2-3682b3592b22"; ConcurrencyStamp = "dbc3b644-2ec8-49cc-aef5-b58e2b413adc"; Name = "admin"; NormalizedName = "ADMIN" |}
+                {| Id = "de3657b8-f385-46ab-be8a-9451b4994c61"; ConcurrencyStamp = "c3849663-1d22-4164-9dad-6e4efe43b1a1"; Name = "user"; NormalizedName = "USER" |}
              |]) |> ignore
         )) |> ignore
 
