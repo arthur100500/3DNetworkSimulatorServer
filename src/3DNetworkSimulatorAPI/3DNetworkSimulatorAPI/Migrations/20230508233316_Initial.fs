@@ -9,7 +9,7 @@ open Microsoft.EntityFrameworkCore.Migrations
 open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 
 [<DbContext(typeof<MyDbContext.ApplicationDbContext>)>]
-[<Migration("20230508230055_Initial")>]
+[<Migration("20230508233316_Initial")>]
 type Initial() =
     inherit Migration()
 
@@ -337,18 +337,6 @@ type Initial() =
                 )
         ) |> ignore
 
-        migrationBuilder.InsertData(
-            table = "AspNetRoles",
-            columns = [| "Id"; "ConcurrencyStamp"; "Name"; "NormalizedName" |],
-            values = [| "58d09902-4edd-45b2-b380-9899052214d7" :> obj; "0d003aaf-2478-42dc-a92a-8441b4d181cd" :> obj; "admin" :> obj; "ADMIN" :> obj |]
-        ) |> ignore
-
-        migrationBuilder.InsertData(
-            table = "AspNetRoles",
-            columns = [| "Id"; "ConcurrencyStamp"; "Name"; "NormalizedName" |],
-            values = [| "7f3e9d51-c611-4043-a24b-363a15b54b49" :> obj; "78c3a3c9-fd72-4f0b-a8fc-e6cb92a478bc" :> obj; "user" :> obj; "USER" :> obj |]
-        ) |> ignore
-
         migrationBuilder.CreateIndex(
             name = "IX_AspNetRoleClaims_RoleId"
             ,table = "AspNetRoleClaims"
@@ -462,11 +450,6 @@ type Initial() =
 
             b.ToTable("AspNetRoles") |> ignore
 
-
-            b.HasData([|
-                {| Id = "58d09902-4edd-45b2-b380-9899052214d7"; ConcurrencyStamp = "0d003aaf-2478-42dc-a92a-8441b4d181cd"; Name = "admin"; NormalizedName = "ADMIN" |}
-                {| Id = "7f3e9d51-c611-4043-a24b-363a15b54b49"; ConcurrencyStamp = "78c3a3c9-fd72-4f0b-a8fc-e6cb92a478bc"; Name = "user"; NormalizedName = "USER" |}
-             |]) |> ignore
         )) |> ignore
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", (fun b ->

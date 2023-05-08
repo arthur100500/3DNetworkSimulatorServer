@@ -50,11 +50,6 @@ type ApplicationDbContextModelSnapshot() =
 
             b.ToTable("AspNetRoles") |> ignore
 
-
-            b.HasData([|
-                {| Id = "f46fcbd1-8ad5-447a-adf2-3682b3592b22"; ConcurrencyStamp = "dbc3b644-2ec8-49cc-aef5-b58e2b413adc"; Name = "admin"; NormalizedName = "ADMIN" |}
-                {| Id = "de3657b8-f385-46ab-be8a-9451b4994c61"; ConcurrencyStamp = "c3849663-1d22-4164-9dad-6e4efe43b1a1"; Name = "user"; NormalizedName = "USER" |}
-             |]) |> ignore
         )) |> ignore
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", (fun b ->
