@@ -8,6 +8,7 @@
     <Compile Include="Middleware\WebsocketMiddleware.fs" />
     <Compile Include="Logger\Logger.fs" />
     <Compile Include="Util\Util.fs" />
+    <Compile Include="Auth\ApplicationDbContext.fs" />
 	<Compile Include="Auth\Auth.fs" />
     <Compile Include="API\GnsHandling\GnsSettings.fs" />
     <Compile Include="API\HttpHandling\HttpHandler.fs" />
@@ -21,7 +22,11 @@
     <PackageReference Include="FsHttp" Version="10.0.0" />
     <PackageReference Include="Giraffe" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="7.0.5" />
     <PackageReference Include="websocket-sharp-Net6.0" Version="1.0.3.1" />
   </ItemGroup>
 </Project>

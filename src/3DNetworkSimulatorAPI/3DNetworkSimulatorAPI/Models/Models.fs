@@ -5,7 +5,6 @@ module Models =
     [<CLIMutable>]
     type LoginModel =
         {
-            Id : int
             [<Required>] Username : string
             [<Required>] Password : string
         }
@@ -23,4 +22,12 @@ module Models =
             [<Required>] Name : string
             [<Required>] OwnderID : int
             [<Required>] JsonAnnotation : string
+        }
+
+    [<CLIMutable>]
+    type RegisterModel = 
+        {
+            Email : string
+            Username : string
+            Password : string
         }

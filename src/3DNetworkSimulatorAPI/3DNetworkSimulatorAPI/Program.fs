@@ -12,6 +12,9 @@ open Microsoft.AspNetCore.Cors
 open System
 open Microsoft.AspNetCore.Authentication.JwtBearer;
 open Microsoft.IdentityModel.Tokens;
+open Microsoft.EntityFrameworkCore.Sqlite
+open Microsoft.EntityFrameworkCore;
+open Microsoft.AspNetCore.Identity
 
 module Program =
     let secret = Auth.secret
@@ -59,10 +62,26 @@ module Program =
                     IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)))
                 ) |> ignore
 
+        services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->  
+            options.UseSqlite("Filename=users.db") |> ignore
+        ) |> ignore
+
+        services.AddIdentity<IdentityUser, IdentityRole>(fun options -> 
+                options.Password.RequireLowercase <- true
+                options.Password.RequireUppercase <- true
+                options.Password.RequireDigit <- true
+                options.Lockout.MaxFailedAccessAttempts <- 10
+                options.Lockout.DefaultLockoutTimeSpan <- TimeSpan.FromMinutes(5)
+                options.User.RequireUniqueEmail <- true
+            )
+            .AddEntityFrameworkStores<MyDbContext.ApplicationDbContext>()
+            .AddDefaultTokenProviders()
+            |> ignore
+
         services
             .AddCors(cors)
             .AddGiraffe()
-        |> ignore
+            |> ignore
 
 
     [<EntryPoint>]

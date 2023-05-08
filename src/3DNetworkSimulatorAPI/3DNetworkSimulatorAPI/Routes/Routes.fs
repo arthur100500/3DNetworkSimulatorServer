@@ -60,5 +60,8 @@ module Routes =
 
     let apiEndpoints : HttpHandler = choose [ 
         subRoute "/v2" (choose apiAllRoutes)
-        route "/token" >=> Auth.handlePostToken  
+        route "/token" >=> Auth.postTokenHandler 
+        route "/register" >=> Auth.registerHandler
+        route "/login" >=> Auth.loginHandler
+        route "/logout" >=> Auth.logoutHandler
     ]
