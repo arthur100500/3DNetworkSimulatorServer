@@ -9,10 +9,41 @@ open Microsoft.EntityFrameworkCore.Migrations
 open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 
 [<DbContext(typeof<MyDbContext.ApplicationDbContext>)>]
-type ApplicationDbContextModelSnapshot() =
-    inherit ModelSnapshot()
+[<Migration("20230509000000_IgnorePhoneNumbers")>]
+type IgnorePhoneNumbers() =
+    inherit Migration()
 
-    override this.BuildModel(modelBuilder: ModelBuilder) =
+    override this.Up(migrationBuilder:MigrationBuilder) =
+        migrationBuilder.DropColumn(
+            name = "PhoneNumber"
+            ,table = "AspNetUsers"
+            ) |> ignore
+
+        migrationBuilder.DropColumn(
+            name = "PhoneNumberConfirmed"
+            ,table = "AspNetUsers"
+            ) |> ignore
+
+
+    override this.Down(migrationBuilder:MigrationBuilder) =
+        migrationBuilder.AddColumn<string>(
+            name = "PhoneNumber"
+            ,table = "AspNetUsers"
+            ,``type`` = "TEXT"
+            ,nullable = false
+            ,defaultValue = ""
+            ) |> ignore
+
+        migrationBuilder.AddColumn<bool>(
+            name = "PhoneNumberConfirmed"
+            ,table = "AspNetUsers"
+            ,``type`` = "INTEGER"
+            ,nullable = false
+            ,defaultValue = false
+            ) |> ignore
+
+
+    override this.BuildTargetModel(modelBuilder: ModelBuilder) =
         modelBuilder.HasAnnotation("ProductVersion", "6.0.16") |> ignore
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", (fun b ->
