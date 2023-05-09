@@ -12,7 +12,6 @@ open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Identity
 open _3DNetworkSimulatorAPI.Models.Models
 open _3DNetworkSimulatorAPI.Util
-open FSharp.Json
 
 
 module Auth =
@@ -28,7 +27,7 @@ module Auth =
             Claim(JwtRegisteredClaimNames.Sub, email);
             Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) |]
 
-        let expires = Nullable(DateTime.UtcNow.AddHours(1.0))
+        let expires = Nullable(DateTime.UtcNow.AddHours(20.0))
         let notBefore = Nullable(DateTime.UtcNow)
         let securityKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
         let signingCredentials = SigningCredentials(key = securityKey, algorithm = SecurityAlgorithms.HmacSha256)
@@ -55,9 +54,13 @@ module Auth =
                 let userManager = ctx.GetService<UserManager<IdentityUser>>()
                 let! user = userManager.GetUserAsync ctx.User
             
-                let tokenResult = generateToken user.UserName
-
-                return! json tokenResult next ctx
+                match user with
+                | null -> 
+                    ctx.SetStatusCode 401
+                    return! next ctx
+                | some -> 
+                    let tokenResult = generateToken user.UserName
+                    return! json tokenResult next ctx
             }
 
     let getContentString (ctx: HttpContext) =
