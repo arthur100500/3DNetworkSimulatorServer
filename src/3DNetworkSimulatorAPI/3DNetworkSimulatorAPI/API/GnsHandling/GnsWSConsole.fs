@@ -7,7 +7,7 @@ open WebSocketSharp
 open System.Net
 open System.Threading
 open _3DNetworkSimulatorAPI.GnsHandling.GnsSettings
-open _3DNetworkSimulatorAPI.Logger;
+open _3DNetworkSimulatorAPI.Logger
 
 
 module GnsWSConsole =
@@ -50,7 +50,7 @@ module GnsWSConsole =
             | _ -> ()
 
         let messageResend (e: MessageEventArgs) =
-            let sendBytes (dataBytes : array<byte>) messageType =
+            let sendBytes (dataBytes: array<byte>) messageType =
                 let log = Encoding.ASCII.GetString dataBytes
                 let dataBytesSegment = ArraySegment<byte> dataBytes
 
@@ -88,5 +88,5 @@ module GnsWSConsole =
         member this.Start() =
             try
                 startListening |> Async.AwaitTask |> Async.RunSynchronously
-            with
-                ex -> logger.LogF "Exception occured. Maybe this was an error"
+            with ex ->
+                logger.LogF "Exception occured. Maybe this was an error"

@@ -10,10 +10,10 @@ open _3DNetworkSimulatorAPI.Routes
 open WebSocketApp.Middleware
 open Microsoft.AspNetCore.Cors
 open System
-open Microsoft.AspNetCore.Authentication.JwtBearer;
-open Microsoft.IdentityModel.Tokens;
+open Microsoft.AspNetCore.Authentication.JwtBearer
+open Microsoft.IdentityModel.Tokens
 open Microsoft.EntityFrameworkCore.Sqlite
-open Microsoft.EntityFrameworkCore;
+open Microsoft.EntityFrameworkCore
 open Microsoft.AspNetCore.Identity
 
 module Program =
@@ -24,64 +24,65 @@ module Program =
     let exitCode = 0
 
     let configureApp (app: IApplicationBuilder) =
-        let allowAll = 
+        let allowAll =
             fun (builder: Infrastructure.CorsPolicyBuilder) ->
                 builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
 
         let cors = Action<_>(allowAll)
 
-        app.UseRouting()
+        app
+            .UseRouting()
             .UseWebSockets()
             .UseMiddleware<WebSocketMiddleware>()
             .UseAuthentication()
             .UseStaticFiles()
             .UseCors(cors)
-            |> ignore
+        |> ignore
 
         app.UseGiraffe Routes.apiEndpoints
 
 
     let configureServices (services: IServiceCollection) =
-        let allowAll = 
+        let allowAll =
             fun (builder: Infrastructure.CorsPolicyBuilder) ->
                 builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
 
-        let cors = 
-            fun (options : Infrastructure.CorsOptions) ->
-                options.AddPolicy ("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))  
+        let cors =
+            fun (options: Infrastructure.CorsOptions) ->
+                options.AddPolicy("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(fun options ->
-                options.TokenValidationParameters <- TokenValidationParameters(
-                    ValidateActor = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = domain,
-                    ValidAudience = domain,
-                    IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)))
-                ) |> ignore
+                options.TokenValidationParameters <-
+                    TokenValidationParameters(
+                        ValidateActor = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = domain,
+                        ValidAudience = domain,
+                        IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+                    ))
+        |> ignore
 
-        services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->  
-            options.UseSqlite("Data Source=identity.db") |> ignore
-        ) |> ignore
+        services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->
+            options.UseSqlite("Data Source=identity.db") |> ignore)
+        |> ignore
 
-        services.AddIdentity<IdentityUser, IdentityRole>(fun options -> 
+        services
+            .AddIdentity<IdentityUser, IdentityRole>(fun options ->
                 options.Password.RequireLowercase <- true
                 options.Password.RequireUppercase <- true
                 options.Password.RequireDigit <- true
                 options.Lockout.MaxFailedAccessAttempts <- 10
                 options.Lockout.DefaultLockoutTimeSpan <- TimeSpan.FromMinutes(5)
-                options.User.RequireUniqueEmail <- true
-            )
+                options.User.RequireUniqueEmail <- true)
             .AddEntityFrameworkStores<MyDbContext.ApplicationDbContext>()
             .AddDefaultTokenProviders()
-            |> ignore
+        |> ignore
 
-        services
-            .AddCors(cors)
-            .AddGiraffe()
-            |> ignore
+        services.AddCors(cors).AddGiraffe() |> ignore
 
 
     [<EntryPoint>]

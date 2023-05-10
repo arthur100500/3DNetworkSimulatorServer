@@ -3,7 +3,7 @@
 open FsHttp
 open _3DNetworkSimulatorAPI.GnsHandling.GnsSettings
 open Util
-open _3DNetworkSimulatorAPI.Logger;
+open _3DNetworkSimulatorAPI.Logger
 
 module HttpHandler =
     type GnsHttpRequest =
@@ -45,9 +45,9 @@ module HttpHandler =
     let sendGnsRequest request currentGnsSettings logger =
         let createRequest =
             function
-            | GET (uriList) -> buildUri currentGnsSettings uriList |> makeGetRequest
-            | POST (uriList, data) -> (buildUri currentGnsSettings uriList |> makePostRequest) data
-            | DELETE (uriList) -> buildUri currentGnsSettings uriList |> makeDeleteRequest
+            | GET(uriList) -> buildUri currentGnsSettings uriList |> makeGetRequest
+            | POST(uriList, data) -> (buildUri currentGnsSettings uriList |> makePostRequest) data
+            | DELETE(uriList) -> buildUri currentGnsSettings uriList |> makeDeleteRequest
 
         let sendRequest request =
             task {

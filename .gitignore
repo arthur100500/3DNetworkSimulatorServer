@@ -391,3 +391,4 @@ src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/Game/Build/Comp.data.gz
 # Databases
 *.db
 src/3DNetworkSimulatorAPI/3DNetworkSimulatorAPI/users.db
+*.db

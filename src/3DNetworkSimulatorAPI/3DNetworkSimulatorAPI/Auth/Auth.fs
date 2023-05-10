@@ -18,19 +18,21 @@ module Auth =
     let secret = "12312312321312kflgsdflgnmsdflmg_REMOVE_LATER"
 
     let domain = "127.0.0.1:5000"
-    
-    let authorize : HttpHandler =
+
+    let authorize: HttpHandler =
         requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
 
     let generateToken email =
-        let claims = [|
-            Claim(JwtRegisteredClaimNames.Sub, email);
-            Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) |]
+        let claims =
+            [| Claim(JwtRegisteredClaimNames.Sub, email)
+               Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) |]
 
         let expires = Nullable(DateTime.UtcNow.AddHours(20.0))
         let notBefore = Nullable(DateTime.UtcNow)
         let securityKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
-        let signingCredentials = SigningCredentials(key = securityKey, algorithm = SecurityAlgorithms.HmacSha256)
+
+        let signingCredentials =
+            SigningCredentials(key = securityKey, algorithm = SecurityAlgorithms.HmacSha256)
 
         let token =
             JwtSecurityToken(
@@ -39,26 +41,26 @@ module Auth =
                 claims = claims,
                 expires = expires,
                 notBefore = notBefore,
-                signingCredentials = signingCredentials)
+                signingCredentials = signingCredentials
+            )
 
-        let tokenResult : Models.TokenResult = {
-            Token = JwtSecurityTokenHandler().WriteToken(token)
-        }
+        let tokenResult: Models.TokenResult =
+            { Token = JwtSecurityTokenHandler().WriteToken(token) }
 
         tokenResult
 
     let postTokenHandler =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
+        fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 //let! model = ctx.BindJsonAsync<Models.LoginModel>()
                 let userManager = ctx.GetService<UserManager<IdentityUser>>()
                 let! user = userManager.GetUserAsync ctx.User
-            
+
                 match user with
-                | null -> 
+                | null ->
                     ctx.SetStatusCode 401
                     return! next ctx
-                | some -> 
+                | some ->
                     let tokenResult = generateToken user.UserName
                     return! json tokenResult next ctx
             }
@@ -66,8 +68,8 @@ module Auth =
     let getContentString (ctx: HttpContext) =
         (ctx.Request.Body |> streamToStr) |> Async.RunSynchronously
 
-    let registerHandler : HttpHandler =
-        fun next ctx -> 
+    let registerHandler: HttpHandler =
+        fun next ctx ->
             task {
                 let userManager = ctx.GetService<UserManager<IdentityUser>>()
                 let content = getContentString ctx
@@ -81,11 +83,11 @@ module Auth =
                 else
                     let errors = result.Errors |> Seq.map (fun e -> e.Description) |> List.ofSeq
                     ctx.SetStatusCode 400
-                    return! text (String.Join (" ", errors)) next ctx
+                    return! text (String.Join(" ", errors)) next ctx
             }
 
-    let loginHandler : HttpHandler =
-        fun next ctx -> 
+    let loginHandler: HttpHandler =
+        fun next ctx ->
             task {
                 let content = getContentString ctx
                 let data = FSharp.Json.Json.deserialize<LoginModel> content
@@ -100,8 +102,8 @@ module Auth =
                     return! text "bad login or password" next ctx
             }
 
-    let logoutHandler : HttpHandler =
-        fun next ctx -> 
+    let logoutHandler: HttpHandler =
+        fun next ctx ->
             task {
                 let signInManager = ctx.GetService<SignInManager<IdentityUser>>()
                 do! signInManager.SignOutAsync()

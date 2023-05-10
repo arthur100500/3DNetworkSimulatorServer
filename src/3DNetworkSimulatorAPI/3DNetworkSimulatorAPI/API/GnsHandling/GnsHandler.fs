@@ -12,16 +12,16 @@ open System.Net.WebSockets
 module GnsHandler =
     type GnsHandler(settings, logger, ownershipCheck) =
         let createRequestTask request =
-            ownershipCheck >=> fun next (ctx: HttpContext) ->
-            task {
-                try
-                    let resp = (text (sendGnsRequest request settings logger))
-                    return! resp next ctx
-                with
-                    | _ -> 
+            ownershipCheck
+            >=> fun next (ctx: HttpContext) ->
+                task {
+                    try
+                        let resp = (text (sendGnsRequest request settings logger))
+                        return! resp next ctx
+                    with _ ->
                         ctx.SetStatusCode 503
                         return! (text "GNS3 is off on the server") next ctx
-            }
+                }
 
         let getContentString (ctx: HttpContext) =
             (ctx.Request.Body |> streamToStr) |> Async.RunSynchronously
