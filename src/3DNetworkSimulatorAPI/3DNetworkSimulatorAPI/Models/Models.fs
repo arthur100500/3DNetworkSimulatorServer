@@ -1,8 +1,11 @@
 ﻿namespace _3DNetworkSimulatorAPI.Models
 
 open System.ComponentModel.DataAnnotations
+open System.ComponentModel.DataAnnotations.Schema
 
 module Models =
+    open Microsoft.AspNetCore.Identity
+
     [<CLIMutable>]
     type LoginModel =
         { [<Required>]
@@ -16,12 +19,24 @@ module Models =
           Token: string }
 
     [<CLIMutable>]
-    type GnsProject =
+    type NSProject =
         { Id: int
           [<Required>]
           Name: string
           [<Required>]
-          OwnderID: int
+          GnsId: string
+          [<Required>]
+          OwnerId: string
+          [<Required>]
+          JsonAnnotation: string }
+
+    [<CLIMutable>]
+    type NSProjectRaw =
+        { Id: int
+          [<Required>]
+          Name: string
+          [<Required>]
+          GnsID: string
           [<Required>]
           JsonAnnotation: string }
 

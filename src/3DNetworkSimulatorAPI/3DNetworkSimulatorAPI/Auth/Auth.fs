@@ -61,7 +61,7 @@ module Auth =
                     ctx.SetStatusCode 401
                     return! next ctx
                 | some ->
-                    let tokenResult = generateToken user.UserName
+                    let tokenResult = generateToken some.UserName
                     return! json tokenResult next ctx
             }
 

@@ -9,7 +9,7 @@ open Microsoft.EntityFrameworkCore.Migrations
 open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 
 [<DbContext(typeof<MyDbContext.ApplicationDbContext>)>]
-[<Migration("20230508233316_Initial")>]
+[<Migration("20230510145511_Initial")>]
 type Initial() =
     inherit Migration()
 
@@ -101,16 +101,6 @@ type Initial() =
                         nullable = false
                         ,``type`` = "TEXT"
                     )
-                PhoneNumber =
-                    table.Column<string>(
-                        nullable = false
-                        ,``type`` = "TEXT"
-                    )
-                PhoneNumberConfirmed =
-                    table.Column<bool>(
-                        nullable = false
-                        ,``type`` = "INTEGER"
-                    )
                 TwoFactorEnabled =
                     table.Column<bool>(
                         nullable = false
@@ -172,6 +162,51 @@ type Initial() =
                         name = "FK_AspNetRoleClaims_AspNetRoles_RoleId"
                         ,column = (fun x -> (x.RoleId) :> obj)
                         ,principalTable = "AspNetRoles"
+                        ,principalColumn = "Id"
+                        ,onDelete = ReferentialAction.Cascade
+                        ) |> ignore
+
+                )
+        ) |> ignore
+
+        migrationBuilder.CreateTable(
+            name = "_NSProject"
+            ,columns = (fun table -> 
+            {|
+                Id =
+                    table.Column<int>(
+                        nullable = false
+                        ,``type`` = "INTEGER"
+                    ).Annotation("Sqlite:Autoincrement", true)
+                Name =
+                    table.Column<string>(
+                        nullable = false
+                        ,``type`` = "TEXT"
+                    )
+                GnsID =
+                    table.Column<string>(
+                        nullable = false
+                        ,``type`` = "TEXT"
+                    )
+                OwnerId =
+                    table.Column<string>(
+                        nullable = false
+                        ,``type`` = "TEXT"
+                    )
+                JsonAnnotation =
+                    table.Column<string>(
+                        nullable = false
+                        ,``type`` = "TEXT"
+                    )
+            |})
+            , constraints =
+                (fun table -> 
+                    table.PrimaryKey("PK__NSProject", (fun x -> (x.Id) :> obj)
+                    ) |> ignore
+                    table.ForeignKey(
+                        name = "FK__NSProject_AspNetUsers_OwnerId"
+                        ,column = (fun x -> (x.OwnerId) :> obj)
+                        ,principalTable = "AspNetUsers"
                         ,principalColumn = "Id"
                         ,onDelete = ReferentialAction.Cascade
                         ) |> ignore
@@ -338,6 +373,12 @@ type Initial() =
         ) |> ignore
 
         migrationBuilder.CreateIndex(
+            name = "IX__NSProject_OwnerId"
+            ,table = "_NSProject"
+            ,column = "OwnerId"
+            ) |> ignore
+
+        migrationBuilder.CreateIndex(
             name = "IX_AspNetRoleClaims_RoleId"
             ,table = "AspNetRoleClaims"
             ,column = "RoleId"
@@ -384,6 +425,10 @@ type Initial() =
 
     override this.Down(migrationBuilder:MigrationBuilder) =
         migrationBuilder.DropTable(
+            name = "_NSProject"
+            ) |> ignore
+
+        migrationBuilder.DropTable(
             name = "AspNetRoleClaims"
             ) |> ignore
 
@@ -414,6 +459,45 @@ type Initial() =
 
     override this.BuildTargetModel(modelBuilder: ModelBuilder) =
         modelBuilder.HasAnnotation("ProductVersion", "6.0.16") |> ignore
+
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+
+            b.Property<int>("Id")
+                .IsRequired(true)
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INTEGER")
+                |> ignore
+
+            b.Property<string>("GnsID")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("JsonAnnotation")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("Name")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("OwnerId")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.HasKey("Id")
+                |> ignore
+
+
+            b.HasIndex("OwnerId")
+                |> ignore
+
+            b.ToTable("_NSProject") |> ignore
+
+        )) |> ignore
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", (fun b ->
 
@@ -540,16 +624,6 @@ type Initial() =
             b.Property<string>("PasswordHash")
                 .IsRequired(true)
                 .HasColumnType("TEXT")
-                |> ignore
-
-            b.Property<string>("PhoneNumber")
-                .IsRequired(true)
-                .HasColumnType("TEXT")
-                |> ignore
-
-            b.Property<bool>("PhoneNumberConfirmed")
-                .IsRequired(true)
-                .HasColumnType("INTEGER")
                 |> ignore
 
             b.Property<string>("SecurityStamp")
@@ -701,6 +775,15 @@ type Initial() =
 
 
             b.ToTable("AspNetUserTokens") |> ignore
+
+        )) |> ignore
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+            b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
+                .WithMany()
+                .HasForeignKey("OwnerId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired()
+                |> ignore
 
         )) |> ignore
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", (fun b ->

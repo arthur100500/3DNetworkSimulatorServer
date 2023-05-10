@@ -14,6 +14,7 @@
     <Compile Include="API\HttpHandling\HttpHandler.fs" />
     <Compile Include="API\GnsHandling\GnsWSConsole.fs" />
     <Compile Include="API\GnsHandling\GnsHandler.fs" />
+	<Compile Include="API\NSProjectHandling\NsProjectHandler.fs" />
 	<Compile Include="Routes\Routes.fs" />
 	<Compile Include="Migrations/*.fs" />
 	<Compile Include="Program.fs" />

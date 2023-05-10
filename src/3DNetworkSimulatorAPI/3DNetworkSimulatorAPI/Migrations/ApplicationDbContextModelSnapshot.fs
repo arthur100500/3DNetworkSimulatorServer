@@ -15,6 +15,45 @@ type ApplicationDbContextModelSnapshot() =
     override this.BuildModel(modelBuilder: ModelBuilder) =
         modelBuilder.HasAnnotation("ProductVersion", "6.0.16") |> ignore
 
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+
+            b.Property<int>("Id")
+                .IsRequired(true)
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INTEGER")
+                |> ignore
+
+            b.Property<string>("GnsId")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("JsonAnnotation")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("Name")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("OwnerId")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.HasKey("Id")
+                |> ignore
+
+
+            b.HasIndex("OwnerId")
+                |> ignore
+
+            b.ToTable("_NSProject") |> ignore
+
+        )) |> ignore
+
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", (fun b ->
 
             b.Property<string>("Id")
@@ -291,6 +330,15 @@ type ApplicationDbContextModelSnapshot() =
 
 
             b.ToTable("AspNetUserTokens") |> ignore
+
+        )) |> ignore
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+            b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
+                .WithMany()
+                .HasForeignKey("OwnerId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired()
+                |> ignore
 
         )) |> ignore
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", (fun b ->

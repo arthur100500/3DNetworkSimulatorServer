@@ -1,6 +1,7 @@
 ﻿namespace _3DNetworkSimulatorAPI.Routes
 
 open Giraffe
+open _3DNetworkSimulatorAPI.API.NSProjectHandling.NSProjectHandler
 open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
 open _3DNetworkSimulatorAPI.GnsHandling
 open _3DNetworkSimulatorAPI.Logger
@@ -11,7 +12,9 @@ open Microsoft.AspNetCore.Http
 open System.Security.Claims
 
 module Routes =
-    let logger = new ConsoleLogger()
+    let logger = ConsoleLogger()
+
+    let dbContextGen = MyDbContext.ApplicationDbContextFactory()
 
     let checkOwnership: HttpHandler =
         let printEmail next (ctx: HttpContext) =
@@ -27,7 +30,13 @@ module Routes =
     let reqs =
         let configs = "Config/" in
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        new GnsHandler(settings, logger, checkOwnership)
+        GnsHandler(settings, logger, checkOwnership)
+        
+    let nsReqs = NSProjectHandler(dbContextGen, logger, checkOwnership) 
+
+    let nsProjectsRoutes =
+        [ route "/projects" >=> (nsReqs.listProjects ())
+          route "/add" >=> (nsReqs.addProject ()) ]
 
     let apiPostRoutes =
         [ route "/projects" >=> (reqs.projectsPost ())
@@ -58,6 +67,7 @@ module Routes =
     let apiEndpoints: HttpHandler =
         choose
             [ subRoute "/v2" (choose apiAllRoutes)
+              subRoute "/ns" (choose nsProjectsRoutes)
               route "/token" >=> Auth.postTokenHandler
               route "/register" >=> Auth.registerHandler
               route "/login" >=> Auth.loginHandler

@@ -9,42 +9,67 @@ open Microsoft.EntityFrameworkCore.Migrations
 open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 
 [<DbContext(typeof<MyDbContext.ApplicationDbContext>)>]
-[<Migration("20230509000000_IgnorePhoneNumbers")>]
-type IgnorePhoneNumbers() =
+[<Migration("20230510162013_MakeOwnerForeignKey")>]
+type MakeOwnerForeignKey() =
     inherit Migration()
 
     override this.Up(migrationBuilder:MigrationBuilder) =
-        migrationBuilder.DropColumn(
-            name = "PhoneNumber"
-            ,table = "AspNetUsers"
-            ) |> ignore
-
-        migrationBuilder.DropColumn(
-            name = "PhoneNumberConfirmed"
-            ,table = "AspNetUsers"
+        migrationBuilder.RenameColumn(
+            name = "GnsID"
+            ,table = "_NSProject"
+            ,newName = "GnsId"
             ) |> ignore
 
 
     override this.Down(migrationBuilder:MigrationBuilder) =
-        migrationBuilder.AddColumn<string>(
-            name = "PhoneNumber"
-            ,table = "AspNetUsers"
-            ,``type`` = "TEXT"
-            ,nullable = false
-            ,defaultValue = ""
-            ) |> ignore
-
-        migrationBuilder.AddColumn<bool>(
-            name = "PhoneNumberConfirmed"
-            ,table = "AspNetUsers"
-            ,``type`` = "INTEGER"
-            ,nullable = false
-            ,defaultValue = false
+        migrationBuilder.RenameColumn(
+            name = "GnsId"
+            ,table = "_NSProject"
+            ,newName = "GnsID"
             ) |> ignore
 
 
     override this.BuildTargetModel(modelBuilder: ModelBuilder) =
         modelBuilder.HasAnnotation("ProductVersion", "6.0.16") |> ignore
+
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+
+            b.Property<int>("Id")
+                .IsRequired(true)
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INTEGER")
+                |> ignore
+
+            b.Property<string>("GnsId")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("JsonAnnotation")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("Name")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.Property<string>("OwnerId")
+                .IsRequired(true)
+                .HasColumnType("TEXT")
+                |> ignore
+
+            b.HasKey("Id")
+                |> ignore
+
+
+            b.HasIndex("OwnerId")
+                |> ignore
+
+            b.ToTable("_NSProject") |> ignore
+
+        )) |> ignore
 
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", (fun b ->
 
@@ -322,6 +347,15 @@ type IgnorePhoneNumbers() =
 
 
             b.ToTable("AspNetUserTokens") |> ignore
+
+        )) |> ignore
+        modelBuilder.Entity("_3DNetworkSimulatorAPI.Models.Models+NSProject", (fun b ->
+            b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
+                .WithMany()
+                .HasForeignKey("OwnerId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired()
+                |> ignore
 
         )) |> ignore
         modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", (fun b ->
