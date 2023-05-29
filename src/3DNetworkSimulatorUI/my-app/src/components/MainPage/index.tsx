@@ -1,9 +1,16 @@
 import React from "react";
-
+import "./index.css"
 const MainPage: React.FC = () => (
     <>
-        <h1> Main page </h1>
-        <a href="/game"> Game page </a>
+        <div id="main-div">
+            <span id="name"> 3D Network simulator</span>
+            <br />
+            <span id="desc"> Based on GNS3 </span>
+            <br />
+            <br />
+            <br />
+            <a id="game-link" href="/game"> Start </a>
+        </div>
     </>
 );
 

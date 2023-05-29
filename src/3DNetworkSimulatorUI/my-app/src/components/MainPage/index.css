@@ -1,0 +1,26 @@
+#name {
+    font-size: 72px;
+    background: -webkit-linear-gradient(45deg, #7700ff, #0084ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#desc {
+    font-size: 32px;
+}
+
+#game-link {
+    color: white;
+    text-decoration: none;
+    padding: 5px 15px 5px 15px;
+    background: -webkit-linear-gradient(45deg, #7700ff, #0084ff);
+    border-radius: 5px;
+    font-size: 32px;
+    transition: all 100ms ease-in;
+}
+
+#game-link:hover {
+    padding: 5px 15px 5px 15px;
+    transition: all 100ms ease-in;
+}
