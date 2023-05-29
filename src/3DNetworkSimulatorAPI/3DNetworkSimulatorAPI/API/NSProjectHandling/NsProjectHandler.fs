@@ -11,9 +11,10 @@ open System.Linq
 open _3DNetworkSimulatorAPI
 open _3DNetworkSimulatorAPI.Models.Models
 open _3DNetworkSimulatorAPI.Util
+open _3DNetworkSimulatorAPI.HttpHandler
 
 module NSProjectHandler =
-    type NSProjectHandler(dbContextFactory: IDesignTimeDbContextFactory<ApplicationDbContext>, logger, ownershipCheck) =
+    type NSProjectHandler(dbContextFactory: IDesignTimeDbContextFactory<ApplicationDbContext>, settings, logger, ownershipCheck) =
         let getContentString (ctx: HttpContext) =
             (ctx.Request.Body |> streamToStr) |> Async.RunSynchronously
 
@@ -45,17 +46,38 @@ module NSProjectHandler =
 
                         match getContentString ctx |> JsonUtil.jsonDeserialize<NSProjectRaw> with
                         | Some x ->
-                            let nsProject: NSProject =
-                                { Id = x.Id
-                                  Name = x.Name
-                                  GnsId = x.GnsID
-                                  OwnerId = user.Id
-                                  JsonAnnotation = x.JsonAnnotation }
+                            // TODO: Add user check
+                            let oldProject = dbContext.NSProject.Where(fun o -> o.Id = x.Id).First ()
 
-                            dbContext.Add nsProject |> ignore
+                            oldProject.JsonAnnotation <- x.JsonAnnotation
+                            oldProject.GnsId <- x.GnsID
+                            oldProject.Name <- x.Name
+
+                            dbContext.Update oldProject |> ignore
                             dbContext.SaveChanges() |> ignore
                             return! text "success" next ctx
                         | None ->
                             ctx.SetStatusCode 400
                             return! text "Incorrect json" next ctx
+                    }
+
+        member this.addEmpty() : HttpHandler =
+            ownershipCheck
+            >=> fun next ctx ->
+                    task {
+                        let! user = getUser ctx
+                        use dbContext = dbContextFactory.CreateDbContext [||]
+
+                        let pId = dbContext.NSProject.Count () + 1
+
+                        let nsProject: NSProject =
+                            { Id = pId
+                              Name = $"New project {pId}"
+                              GnsId = "uninited"
+                              OwnerId = user.Id
+                              JsonAnnotation = "[]" }
+
+                        dbContext.Add nsProject |> ignore
+                        dbContext.SaveChanges() |> ignore
+                        return! text "success" next ctx
                     }

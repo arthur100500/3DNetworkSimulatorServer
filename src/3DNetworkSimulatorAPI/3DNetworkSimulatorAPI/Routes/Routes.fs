@@ -14,6 +14,8 @@ open System.Security.Claims
 module Routes =
     let logger = ConsoleLogger()
 
+    let configs = "Config/"
+
     let dbContextGen = MyDbContext.ApplicationDbContextFactory()
 
     let checkOwnership: HttpHandler =
@@ -25,18 +27,21 @@ module Routes =
         let authorize =
             requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
 
-        authorize >=> printEmail
+        // authorize >=> printEmail
+        fun n c -> n c
 
     let reqs =
-        let configs = "Config/" in
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
         GnsHandler(settings, logger, checkOwnership)
         
-    let nsReqs = NSProjectHandler(dbContextGen, logger, checkOwnership) 
+    let nsReqs = 
+        let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
+        NSProjectHandler(dbContextGen, settings, logger, checkOwnership) 
 
     let nsProjectsRoutes =
         [ route "/projects" >=> (nsReqs.listProjects ())
-          route "/add" >=> (nsReqs.addProject ()) ]
+          route "/update" >=> (nsReqs.addProject ()) 
+          route "/new" >=> (nsReqs.addEmpty ()) ]
 
     let apiPostRoutes =
         [ route "/projects" >=> (reqs.projectsPost ())
