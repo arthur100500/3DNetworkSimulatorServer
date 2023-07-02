@@ -36,7 +36,7 @@ module Routes =
         
     let nsReqs = 
         let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        NSProjectHandler(dbContextGen, settings, logger, checkOwnership) 
+        NSProjectHandler(dbContextGen, settings, logger) 
 
     let nsProjectsRoutes =
         [ route "/projects" >=> (nsReqs.listProjects)

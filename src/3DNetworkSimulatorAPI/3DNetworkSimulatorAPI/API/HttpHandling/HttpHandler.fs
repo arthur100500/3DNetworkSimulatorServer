@@ -52,6 +52,7 @@ module HttpHandler =
         let sendRequest request =
             task {
                 let! response = request |> Request.sendAsync
+                
                 return response
             } in
 

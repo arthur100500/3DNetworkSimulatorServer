@@ -15,7 +15,7 @@ open _3DNetworkSimulatorAPI.HttpHandler
 open _3DNetworkSimulatorAPI.JsonUtil
 
 module NSProjectHandler =
-    type NSProjectHandler(dbContextFactory: IDesignTimeDbContextFactory<ApplicationDbContext>, settings, logger, ownershipCheck) =
+    type NSProjectHandler(dbContextFactory: IDesignTimeDbContextFactory<ApplicationDbContext>, settings, logger) =
         let getContentString (ctx: HttpContext) =
             (ctx.Request.Body |> streamToStr) |> Async.RunSynchronously
 
