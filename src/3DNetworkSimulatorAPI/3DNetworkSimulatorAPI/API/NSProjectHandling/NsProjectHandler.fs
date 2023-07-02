@@ -1,6 +1,5 @@
 namespace _3DNetworkSimulatorAPI.API.NSProjectHandling
 
-open FSharp.Json
 open Microsoft.AspNetCore.Http
 open Microsoft.EntityFrameworkCore.Design
 open Microsoft.FSharp.Core
