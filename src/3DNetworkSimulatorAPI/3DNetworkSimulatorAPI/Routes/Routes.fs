@@ -39,9 +39,9 @@ module Routes =
         NSProjectHandler(dbContextGen, settings, logger, checkOwnership) 
 
     let nsProjectsRoutes =
-        [ route "/projects" >=> (nsReqs.listProjects ())
-          route "/update" >=> (nsReqs.addProject ()) 
-          route "/new" >=> (nsReqs.addEmpty ()) ]
+        [ route "/projects" >=> (nsReqs.listProjects)
+          route "/update" >=> (nsReqs.updateProject) 
+          route "/new" >=> (nsReqs.createNewProject) ]
 
     let apiPostRoutes =
         [ route "/projects" >=> (reqs.projectsPost ())

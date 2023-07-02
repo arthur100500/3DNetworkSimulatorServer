@@ -24,8 +24,8 @@ module Util =
 module JsonUtil =
     let jsonDeserialize<'T> json =
         try
-            Some(Json.deserialize<'T> json)
+            Ok (Json.deserialize<'T> json)
         with _ ->
-            None
+            Error (500, "Serialization Error")
 
     let jsonSerialize = Json.serialize

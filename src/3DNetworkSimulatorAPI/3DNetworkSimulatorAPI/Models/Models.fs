@@ -42,3 +42,9 @@ module Models =
         { Email: string
           Username: string
           Password: string }
+
+
+   (* Used for project creation *)
+   type GnsProject =
+       { name: string
+         project_id: string }
