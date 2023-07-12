@@ -1,5 +1,6 @@
 namespace _3DNetworkSimulatorAPI.API.NSProjectHandling
 
+open System.Security.Claims
 open Microsoft.AspNetCore.Http
 open Microsoft.EntityFrameworkCore.Design
 open Microsoft.FSharp.Core
@@ -21,8 +22,16 @@ module NSProjectHandler =
 
         let getUser (ctx: HttpContext) =
             task {
-                let userManager = ctx.GetService<UserManager<IdentityUser>>()
-                return! userManager.GetUserAsync ctx.User
+                let userId = ctx.User.FindFirst ClaimTypes.NameIdentifier
+                
+                match userId with
+                | null ->
+                    let userManager = ctx.GetService<UserManager<IdentityUser>>()
+                    return! userManager.GetUserAsync ctx.User
+                | _ ->
+                    use dbContext = dbContextFactory.CreateDbContext [||]
+                    let user = dbContext.Users.Where(fun x -> x.Id = userId.Value).FirstOrDefault()
+                    return user
             }
 
         member this.listProjects next ctx =

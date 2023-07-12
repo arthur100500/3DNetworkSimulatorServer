@@ -51,21 +51,6 @@ module Program =
             fun (options: Infrastructure.CorsOptions) ->
                 options.AddPolicy("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))
 
-        services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(fun options ->
-                options.TokenValidationParameters <-
-                    TokenValidationParameters(
-                        ValidateActor = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = domain,
-                        ValidAudience = domain,
-                        IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
-                    ))
-        |> ignore
-
         services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->
             options.UseSqlite("Data Source=identity.db") |> ignore)
         |> ignore
@@ -80,6 +65,21 @@ module Program =
                 options.User.RequireUniqueEmail <- true)
             .AddEntityFrameworkStores<MyDbContext.ApplicationDbContext>()
             .AddDefaultTokenProviders()
+        |> ignore
+        
+        services
+            .AddAuthentication(fun opt -> opt.DefaultAuthenticateScheme <- JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(fun options ->
+                options.TokenValidationParameters <-
+                    TokenValidationParameters(
+                        ValidateActor = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = domain,
+                        ValidAudience = domain,
+                        IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+                    ))
         |> ignore
 
         services.AddCors(cors).AddGiraffe() |> ignore

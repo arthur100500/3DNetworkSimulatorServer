@@ -76,4 +76,6 @@ module Routes =
               route "/token" >=> Auth.postTokenHandler
               route "/register" >=> Auth.registerHandler
               route "/login" >=> Auth.loginHandler
-              route "/logout" >=> Auth.logoutHandler ]
+              route "/logout" >=> Auth.logoutHandler
+              route "/getjwt" >=> (Auth.getJwt dbContextGen)
+              route "/testjwt" >=> Auth.testJwt]
