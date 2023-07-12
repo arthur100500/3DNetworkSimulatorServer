@@ -2,6 +2,7 @@
 
 open System.Text
 open System.IO
+open FSharp.Json
 
 module Util =
     let time () = System.DateTime.Now.ToString()
@@ -19,3 +20,12 @@ module Util =
 
             return result
         }
+
+module JsonUtil =
+    let jsonDeserialize<'T> json =
+        try
+            Ok (Json.deserialize<'T> json)
+        with _ ->
+            Error (500, "Serialization Error")
+
+    let jsonSerialize = Json.serialize

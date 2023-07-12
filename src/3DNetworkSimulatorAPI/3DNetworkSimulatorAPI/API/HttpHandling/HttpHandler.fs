@@ -3,6 +3,7 @@
 open FsHttp
 open _3DNetworkSimulatorAPI.GnsHandling.GnsSettings
 open Util
+open _3DNetworkSimulatorAPI.Logger
 
 module HttpHandler =
     type GnsHttpRequest =
@@ -13,8 +14,8 @@ module HttpHandler =
     let private buildUri (settings: gnsSettings) (parts: list<string>) =
         List.fold (fun p n -> p + "/" + n) (getAddrBegin settings) parts
 
-    let private makePostRequest (endpoint: string) (jsonData: string) =
-        printfn "Post to: %s" endpoint
+    let private makePostRequest (endpoint: string) (jsonData: string) (logger: ILogger) =
+        logger.LogF "Post to: %s" endpoint
 
         http {
             POST endpoint
@@ -23,8 +24,8 @@ module HttpHandler =
             json jsonData
         }
 
-    let private makeGetRequest (endpoint: string) =
-        printfn "Get to: %s" endpoint
+    let private makeGetRequest (endpoint: string) (logger: ILogger) =
+        logger.LogF "Get to: %s" endpoint
 
         http {
             GET endpoint
@@ -32,8 +33,8 @@ module HttpHandler =
             body
         }
 
-    let private makeDeleteRequest (endpoint: string) =
-        printfn "Delete to: %s" endpoint
+    let private makeDeleteRequest (endpoint: string) (logger: ILogger) =
+        logger.LogF "Delete to: %s" endpoint
 
         http {
             DELETE endpoint
@@ -41,16 +42,17 @@ module HttpHandler =
             body
         }
 
-    let sendGnsRequest request currentGnsSettings =
+    let sendGnsRequest request currentGnsSettings logger =
         let createRequest =
             function
-            | GET (uriList) -> buildUri currentGnsSettings uriList |> makeGetRequest
-            | POST (uriList, data) -> (buildUri currentGnsSettings uriList |> makePostRequest) data
-            | DELETE (uriList) -> buildUri currentGnsSettings uriList |> makeDeleteRequest in
+            | GET(uriList) -> buildUri currentGnsSettings uriList |> makeGetRequest
+            | POST(uriList, data) -> (buildUri currentGnsSettings uriList |> makePostRequest) data
+            | DELETE(uriList) -> buildUri currentGnsSettings uriList |> makeDeleteRequest
 
         let sendRequest request =
             task {
                 let! response = request |> Request.sendAsync
+                
                 return response
             } in
 
@@ -60,4 +62,4 @@ module HttpHandler =
             let textContent = (content.ReadAsStream()) |> streamToStr |> Async.RunSynchronously in
             textContent in
 
-        createRequest request |> getResponseText
+        createRequest request logger |> getResponseText

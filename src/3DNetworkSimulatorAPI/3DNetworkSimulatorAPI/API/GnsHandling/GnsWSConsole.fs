@@ -7,10 +7,11 @@ open WebSocketSharp
 open System.Net
 open System.Threading
 open _3DNetworkSimulatorAPI.GnsHandling.GnsSettings
+open _3DNetworkSimulatorAPI.Logger
 
 
 module GnsWSConsole =
-    type GnsWSConsole(ws: WebSockets.WebSocket, url: string, settings: gnsSettings) =
+    type GnsWSConsole(ws: WebSockets.WebSocket, url: string, settings: gnsSettings, logger: ILogger) =
         let transformUrl (url: string) (settings: gnsSettings) =
             let sliced = (url.Split "v2")
 
@@ -46,11 +47,10 @@ module GnsWSConsole =
             match result.MessageType with
             | WebSocketMessageType.Text -> sendStringMessage
             | WebSocketMessageType.Binary -> sendByteMessage
-            | WebSocketMessageType.Close -> ()
-            | _ -> printfn "Unsopported type"
+            | _ -> ()
 
         let messageResend (e: MessageEventArgs) =
-            let sendBytes (dataBytes : array<byte>) messageType =
+            let sendBytes (dataBytes: array<byte>) messageType =
                 let log = Encoding.ASCII.GetString dataBytes
                 let dataBytesSegment = ArraySegment<byte> dataBytes
 
@@ -77,16 +77,16 @@ module GnsWSConsole =
             let transformedUrl = transformUrl url settings
 
             task {
-                printfn "Connecting %s and %s" url transformedUrl
+                logger.LogF "Connecting %s and %s" url transformedUrl
                 let gnsWs = createGnsWS transformedUrl
                 gnsWs.OnMessage.Add messageResend
                 gnsWs.Connect()
                 mirrorLoop gnsWs
-                printfn "Disconnecting %s and %s" url transformedUrl
+                logger.LogF "Disconnecting %s and %s" url transformedUrl
             }
 
         member this.Start() =
-            try
+            //try
                 startListening |> Async.AwaitTask |> Async.RunSynchronously
-            with
-                ex -> printfn "Exception occured. Maybe this was an error"
+            //with ex ->
+            //    logger.LogF "Exception occured. Maybe this was an error"

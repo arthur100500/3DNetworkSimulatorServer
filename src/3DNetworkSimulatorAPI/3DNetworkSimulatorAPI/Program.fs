@@ -1,80 +1,89 @@
 namespace _3DNetworkSimulatorAPI
 
-open System.IO
+open System.Text
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
-open _3DNetworkSimulatorAPI.GnsHandling.GnsHandler
-open _3DNetworkSimulatorAPI.GnsHandling
-open Microsoft.AspNetCore.Http
+open _3DNetworkSimulatorAPI.Auth
+open _3DNetworkSimulatorAPI.Routes
 open WebSocketApp.Middleware
-open _3DNetworkSimulatorAPI.Views.Views
 open Microsoft.AspNetCore.Cors
 open System
+open Microsoft.AspNetCore.Authentication.JwtBearer
+open Microsoft.IdentityModel.Tokens
+open Microsoft.EntityFrameworkCore.Sqlite
+open Microsoft.EntityFrameworkCore
+open Microsoft.AspNetCore.Identity
 
 module Program =
+    let secret = Auth.secret
+
+    let domain = Auth.domain
+
     let exitCode = 0
 
-    let reqs =
-        let configs = "Config/" in
-        let settings = File.ReadAllText(configs + "gnsconfig.json") |> GnsSettings.fromJson in
-        new GnsHandler(settings)
-
-    let displayNotFound next (ctx: HttpContext) =
-        (text (HttpContextExtensions.GetRequestUrl ctx)) next ctx
-
-    let apiEndpoints =
-        choose
-            [ subRoute
-                  "/v2"
-                  choose[GET
-                         >=> choose
-                             [ route "/" >=> (warbler (fun _ -> text "This is an API"))
-                               route "/projects" >=> (reqs.projectsGet ())
-                               routef "/projects/%s/nodes" reqs.nodesGet
-                               routef "/projects/%s/links" reqs.linksGet
-                               routef "/projects/%s/links/%s" reqs.linksIDGet ]
-
-                         POST
-                         >=> choose
-                             [ route "/projects" >=> (reqs.projectsPost ())
-                               routef "/projects/%s/open" reqs.projectsOpenPost
-                               routef "/projects/%s/nodes" reqs.nodesPost
-                               routef "/projects/%s/nodes/%s" reqs.nodesIdPost
-                               routef "/projects/%s/nodes/%s/start" reqs.nodesStartPost
-                               routef "/projects/%s/nodes/%s/stop" reqs.nodesStopPost
-                               routef "/projects/%s/links" reqs.linksPost ]
-
-                         DELETE
-                         >=> choose
-                             [ routef "/projects/%s/nodes/%s" reqs.nodesIdDelete
-                               routef "/projects/%s/links/%s" reqs.linksIDDelete ]
-
-                         routef "/projects/%s/nodes/%s/console/ws" reqs.webConsole] ]
-
-
     let configureApp (app: IApplicationBuilder) =
-        app.UseRouting().UseWebSockets().UseMiddleware<WebSocketMiddleware>() |> ignore
+        let allowAll =
+            fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
 
-        app.UseCors(
-            Action<_>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
-                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
-        )
+        let cors = Action<_>(allowAll)
+
+        app
+            .UseRouting()
+            .UseWebSockets()
+            .UseMiddleware<WebSocketMiddleware>()
+            .UseAuthentication()
+            .UseStaticFiles()
+            .UseCors(cors)
         |> ignore
 
-        app.UseGiraffe apiEndpoints
+        app.UseGiraffe Routes.apiEndpoints
+
 
     let configureServices (services: IServiceCollection) =
+        let allowAll =
+            fun (builder: Infrastructure.CorsPolicyBuilder) ->
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore
+
+        let cors =
+            fun (options: Infrastructure.CorsOptions) ->
+                options.AddPolicy("Policy", Action<Infrastructure.CorsPolicyBuilder>(allowAll))
+
         services
-            .AddCors(fun options ->
-                options.AddPolicy(
-                    "Policy",
-                    Action<Infrastructure.CorsPolicyBuilder>(fun (builder: Infrastructure.CorsPolicyBuilder) ->
-                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod() |> ignore)
-                ))
-            .AddGiraffe()
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(fun options ->
+                options.TokenValidationParameters <-
+                    TokenValidationParameters(
+                        ValidateActor = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = domain,
+                        ValidAudience = domain,
+                        IssuerSigningKey = SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+                    ))
         |> ignore
+
+        services.AddDbContext<MyDbContext.ApplicationDbContext>(fun options ->
+            options.UseSqlite("Data Source=identity.db") |> ignore)
+        |> ignore
+
+        services
+            .AddIdentity<IdentityUser, IdentityRole>(fun options ->
+                options.Password.RequireLowercase <- true
+                options.Password.RequireUppercase <- true
+                options.Password.RequireDigit <- true
+                options.Lockout.MaxFailedAccessAttempts <- 10
+                options.Lockout.DefaultLockoutTimeSpan <- TimeSpan.FromMinutes(5)
+                options.User.RequireUniqueEmail <- true)
+            .AddEntityFrameworkStores<MyDbContext.ApplicationDbContext>()
+            .AddDefaultTokenProviders()
+        |> ignore
+
+        services.AddCors(cors).AddGiraffe() |> ignore
+
 
     [<EntryPoint>]
     let main args =
